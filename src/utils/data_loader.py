@@ -241,7 +241,7 @@ def test_data_loader(test_dir = '/data/test/', do_n4 = True, do_ws = True, do_re
 
 
     for i, test_patient in enumerate(test_patient_list):
-        print("Processing [{0}/{1}] Image of Positive Patient...".format(i+1, len(test_patient_list)))
+        print("Processing [{0}/{1}] Image of Test Patient...".format(i+1, len(test_patient_list)))
 
         ADC_path, FLAIR_path, b1000_path, BRAIN_path, INFARCT_path = sorted([path for path in test_file_list if test_patient in path])
 
