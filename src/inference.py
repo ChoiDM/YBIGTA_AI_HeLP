@@ -4,6 +4,9 @@ import pandas as pd
 import xgboost as xgb
 import pickle
 
+import warnings
+warnings.filterwarnings('ignore')
+
 
 # Setting
 test_dir = '/data/test/'
