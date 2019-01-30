@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import os
 from random import shuffle
+import datetime
 
 from utils.N4Correction import n4correction
 from utils.Resample import resample, mask2binary
@@ -29,7 +30,8 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
 
 
     for i, pos_patient in enumerate(pos_patient_list):
-        print("Processing [{0}/{1}] Image of Positive Patient...".format(i+1, len(pos_patient_list)))
+        time = str(datetime.datetime.now()).split()[1].split('.')[0]
+        print("Processing [{0}/{1}] Image of Positive Patient... ({2})".format(i+1, len(pos_patient_list), time))
 
         ADC_path, FLAIR_path, b1000_path, BRAIN_path, INFARCT_path = sorted([path for path in pos_file_list if pos_patient in path])
 
@@ -53,7 +55,8 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
                 BRAIN_array = resample(BRAIN_array, origin_voxel_size)
                 INFARCT_array = resample(INFARCT_array, origin_voxel_size)
 
-                print(">>> Finished : Voxel Size Resampling")
+                time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                print(">>> Finished : Voxel Size Resampling ({})".format(time))
 
 
             # Make Mask to Binary (0 or 1)
@@ -68,7 +71,8 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
                 ADC_array = n4correction(ADC_array)
                 FLAIR_array = n4correction(FLAIR_array)
 
-                print(">>> Finished : N4 Bias Correction")
+                time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                print(">>> Finished : N4 Bias Correction ({})".format(time))
 
 
             # Pre-processing (3)- White-stripe Normalization
@@ -76,7 +80,8 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
                 ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
 
-                print(">>> Finished : White-stripe Normalization")
+                time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                print(">>> Finished : White-stripe Normalization ({})".format(time))
 
             # Feature Extraction by Radiomics
             ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array)
@@ -118,13 +123,15 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
             patient_num.append(pos_patient)
 
         except Exception as ex:
-            print("Error !!! [Patient Number : {}]".format(i+1))
+            time = str(datetime.datetime.now()).split()[1].split('.')[0]
+            print("Error !!! [Patient Number : {}] ({})".format(i+1, time))
             print(ex)
 
 
 
     for i, neg_patient in enumerate(neg_patient_list):
-        print("Processing [{0}/{1}] Image of Negative Patient...".format(i+1, len(neg_patient_list)))
+        time = str(datetime.datetime.now()).split()[1].split('.')[0]
+        print("Processing [{0}/{1}] Image of Negative Patient... ({2})".format(i+1, len(neg_patient_list), time))
 
         ADC_path, FLAIR_path, b1000_path, BRAIN_path, INFARCT_path = sorted([path for path in neg_file_list if neg_patient in path])
 
@@ -147,7 +154,8 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
                 BRAIN_array = resample(BRAIN_array, origin_voxel_size)
                 INFARCT_array = resample(INFARCT_array, origin_voxel_size)
 
-                print(">>> Finished : Voxel Size Resampling")
+                time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                print(">>> Finished : Voxel Size Resampling ({})".format(time))
 
 
             # Make Mask to Binary (0 or 1)
@@ -162,7 +170,8 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
                 ADC_array = n4correction(ADC_array)
                 FLAIR_array = n4correction(FLAIR_array)
 
-                print(">>> Finished : N4 Bias Correction")
+                time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                print(">>> Finished : N4 Bias Correction ({})".format(time))
 
 
             # Pre-processing (3)- White-stripe Normalization
@@ -170,7 +179,8 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
                 ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
 
-                print(">>> Finished : White-stripe Normalization")
+                time = time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                print(">>> Finished : White-stripe Normalization ({})".format(time))
 
             # Feature Extraction by Radiomics
             ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array)
@@ -211,7 +221,8 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
             patient_num.append(neg_patient)
 
         except Exception as ex:
-            print("Error !!! [Patient Number : {}]".format(i+1))
+            time = str(datetime.datetime.now()).split()[1].split('.')[0]
+            print("Error !!! [Patient Number : {}] ({})".format(i+1, time))
             print(ex)
 
             
@@ -225,7 +236,8 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
 
     X = np.array(X)
     y = np.array(y)
-    print("Created X of shape {} and y of shape {}".format(X.shape, y.shape))
+    time = str(datetime.datetime.now()).split()[1].split('.')[0]
+    print("Created X of shape {} and y of shape {} ({})".format(X.shape, y.shape, time))
 
     if return_patient_num:
         return X, y, patient_num
@@ -249,7 +261,8 @@ def test_data_loader(test_dir = '/data/test/', do_n4 = True, do_ws = True, do_re
 
 
     for i, test_patient in enumerate(test_patient_list):
-        print("Processing [{0}/{1}] Image of Test Patient...".format(i+1, len(test_patient_list)))
+        time = str(datetime.datetime.now()).split()[1].split('.')[0]
+        print("Processing [{0}/{1}] Image of Test Patient... ({2})".format(i+1, len(test_patient_list), time))
 
         ADC_path, FLAIR_path, b1000_path, BRAIN_path, INFARCT_path = sorted([path for path in test_file_list if test_patient in path])
 
@@ -271,7 +284,8 @@ def test_data_loader(test_dir = '/data/test/', do_n4 = True, do_ws = True, do_re
             BRAIN_array = resample(BRAIN_array, origin_voxel_size)
             INFARCT_array = resample(INFARCT_array, origin_voxel_size)
 
-            print(">>> Finished : Voxel Size Resampling")
+            time = str(datetime.datetime.now()).split()[1].split('.')[0]
+            print(">>> Finished : Voxel Size Resampling ({})".format(time))
 
 
         # Make Mask to Binary (0 or 1)
@@ -286,7 +300,8 @@ def test_data_loader(test_dir = '/data/test/', do_n4 = True, do_ws = True, do_re
             ADC_array = n4correction(ADC_array)
             FLAIR_array = n4correction(FLAIR_array)
 
-            print(">>> Finished : N4 Bias Correction")
+            time = str(datetime.datetime.now()).split()[1].split('.')[0]
+            print(">>> Finished : N4 Bias Correction ({})".format(time))
 
 
         # Pre-processing (3)- White-stripe Normalization
@@ -294,7 +309,8 @@ def test_data_loader(test_dir = '/data/test/', do_n4 = True, do_ws = True, do_re
             ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
             FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
 
-            print(">>> Finished : White-stripe Normalization")
+            time = str(datetime.datetime.now()).split()[1].split('.')[0]
+            print(">>> Finished : White-stripe Normalization ({})".format(time))
 
 
         # Feature Extraction by Radiomics

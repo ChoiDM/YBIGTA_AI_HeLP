@@ -1,9 +1,13 @@
 from utils.data_loader import train_data_loader
 import xgboost as xgb
 import pickle
+import datetime
 
 import warnings
 warnings.filterwarnings('ignore')
+
+time = str(datetime.datetime.now()).split()[1].split('.')[0]
+print("Start:", time)
 
 # Setting
 pos_dir = "/data/train/positive/"
