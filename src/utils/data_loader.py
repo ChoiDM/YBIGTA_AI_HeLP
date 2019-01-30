@@ -10,10 +10,6 @@ from utils.Resample import resample, mask2binary
 from utils.WhiteStripeNormalization import ws_normalize
 from utils.FeatureExtract import feature_extract
 
-import warnings
-warnings.filterwarnings('ignore')
-
-
 
 # Feature Extraction for Train
 def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/negative/', do_n4 = True, do_ws = True, do_resample = True,
