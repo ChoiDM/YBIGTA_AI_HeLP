@@ -23,4 +23,5 @@ $ docker save <image name>:0.0.1 | gzip > <image name>.tar.gz
 # 예시 docker save test:0.0.1 | gzip > test.tar.gz
 ```
 
-5. 
+5. 제출
+- https://help-khidi.kakaobrain.com/contests/116
