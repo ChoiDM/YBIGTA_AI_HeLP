@@ -123,6 +123,7 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
 
         except Exception as ex:
             print("Error !!! [Patient Number : {}]".format(i+1))
+            print(ex)
 
 
 
@@ -215,8 +216,9 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
 
         except Exception as ex:
             print("Error !!! [Patient Number : {}]".format(i+1))
+            print(ex)
 
-
+            
     if do_shuffle:
         shuffle_list = [[X_value, y_value, num] for X_value, y_value, num in zip(X, y, patient_num)]
         shuffle(shuffle_list)
