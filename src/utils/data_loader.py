@@ -63,7 +63,7 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
         BRAIN_array = mask2binary(BRAIN_array)
         INFARCT_array = mask2binary(INFARCT_array)
         print("Unique Value of BRAIN mask :", np.unique(BRAIN_array))
-        print("Unique Value of BRAIN mask :", np.unique(INFARCT_array))
+        print("Unique Value of INFARCT mask :", np.unique(INFARCT_array))
 
 
         # Pre-processing (2)- N4 Bias Correction
