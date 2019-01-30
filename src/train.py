@@ -33,4 +33,4 @@ xgbClassifier.fit(X_train, y_train)
 
 
 # Save model to file
-pickle.dump(xgbClassifier, open('xgb.pickle.dat', 'wb'))
+pickle.dump(xgbClassifier, open('/data/model/xgb.pickle.dat', 'wb'))
