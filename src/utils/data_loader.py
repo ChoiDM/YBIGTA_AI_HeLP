@@ -225,6 +225,7 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
 
     X = np.array(X)
     y = np.array(y)
+    print("Created X of shape {} and y of shape {}".format(X.shape, y.shape))
 
     if return_patient_num:
         return X, y, patient_num
