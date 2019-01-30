@@ -18,7 +18,12 @@ return_patient_num = True
 
 
 # Data Load
-X_test, y_test, patient_num = test_data_loader(test_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num)
+X_test, patient_num = test_data_loader(test_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num)
+
+
+#########################################################################################################################
+#########################################################################################################################
+#### Modify here ####
 
 
 # Load trained model
