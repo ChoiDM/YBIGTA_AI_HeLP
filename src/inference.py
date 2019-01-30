@@ -30,7 +30,7 @@ X_test, patient_num = test_data_loader(test_dir, do_n4, do_ws, do_resample, do_s
 
 
 # Load trained model
-xgbClassifier = pickle.load(open('xgb.pickle.dat', 'rb'))
+xgbClassifier = pickle.load(open('/data/model/xgb.pickle.dat', 'rb'))
 
 
 # Make Predictions for Test Data
