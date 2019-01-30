@@ -16,6 +16,11 @@ save_to_disk = False
 return_patient_num = False
 
 
+#########################################################################################################################
+#########################################################################################################################
+#### Modify here ####
+
+
 # Data Load
 X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num)
 
