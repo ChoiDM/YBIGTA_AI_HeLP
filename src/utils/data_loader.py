@@ -23,8 +23,8 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
     pos_file_list = glob(pos_dir + "*")
     neg_file_list = glob(neg_dir + "*")
 
-    pos_patient_list = list(set([path.split('_')[0] for path in os.listdir(pos_dir)]))
-    neg_patient_list = list(set([path.split('_')[0] for path in os.listdir(neg_dir)]))
+    pos_patient_list = sorted(list(set([path.split('_')[0] for path in os.listdir(pos_dir)])))
+    neg_patient_list = sorted(list(set([path.split('_')[0] for path in os.listdir(neg_dir)])))
 
     # Data Container
     X = []
