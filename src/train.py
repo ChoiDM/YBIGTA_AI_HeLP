@@ -6,8 +6,20 @@ import datetime
 import warnings
 warnings.filterwarnings('ignore')
 
+# Print Current Time
 time = str(datetime.datetime.now()).split()[1].split('.')[0]
 print("Start:", time)
+
+
+# Print Information
+name = 'main-branch'
+model = 'XGBoost'
+summary = 'No hyper-parameter tuning. Basic Model'
+
+print('Author Name :', name)
+print('Model :', model)
+print('Summary :', summary)
+
 
 # Setting
 pos_dir = "/data/train/positive/"
