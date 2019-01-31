@@ -1,3 +1,4 @@
+import numpy as np
 from utils.data_loader import train_data_loader
 import xgboost as xgb
 from sklearn.ensemble import RandomForestClassifier
