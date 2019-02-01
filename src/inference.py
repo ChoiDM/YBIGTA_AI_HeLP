@@ -1,8 +1,13 @@
 from utils.data_loader import test_data_loader
 from utils.inference_tools import pred_to_binary, export_csv
-import pandas as pd
+
 import xgboost as xgb
+from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+
+import pandas as pd
 import pickle
+import datetime
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -30,12 +35,15 @@ X_test, patient_num = test_data_loader(test_dir, do_n4, do_ws, do_resample, do_s
 
 
 # Load trained model
-xgbClassifier = pickle.load(open('/data/model/xgb.pickle.dat', 'rb'))
+threshold = 0.65
+model = pickle.load(open('/data/model/model.pickle.dat', 'rb'))
+print("\nStart Inference...")
+print("Threshold :", threshold)
 
 
 # Make Predictions for Test Data
-y_pred = xgbClassifier.predict_proba(X_test)[:, 1]
-y_pred_binary = pred_to_binary(y_pred, threshold = 0.5)
+y_pred = model.predict_proba(X_test)[:, 1]
+y_pred_binary = pred_to_binary(y_pred, threshold = threshold = threshold)
 
 
 # Make 'output.csv'
