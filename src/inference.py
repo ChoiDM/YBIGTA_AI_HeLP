@@ -9,6 +9,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import fbeta_score, make_scorer
 
 import pandas as pd
+import numpy as np
 import pickle
 import datetime
 
@@ -61,6 +62,15 @@ meta.load_weights('/data/model/model_weights.h5')
 # Make Predictions for Test Data
 print("\n---------- Inference ----------")
 print("Threshold :", threshold)
+
+def stacking(models, data) : 
+    result = []
+    
+    for model in models :
+        result.append(model.predict_proba(data))
+        
+    return np.array(result).T
+
 models = [model1, model2, model3, model4, model5, model6, model7, model8, model9]
 S_test = stacking(models, X_test)
 

@@ -5,7 +5,7 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression, Lasso, RidgeClassifier, ElasticNet, Lars, LassoLars
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import fbeta_score, make_score
+from sklearn.metrics import fbeta_score, make_scorer
 
 import pandas as pd
 import numpy as np
