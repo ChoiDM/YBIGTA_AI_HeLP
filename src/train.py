@@ -149,7 +149,7 @@ print("Best Score : {}".format(m4_grid_1.best_score_))
 print("Best Params : {}".format(m4_grid_1.best_params_))
 
 m4_params2 = {
-    'n_estimators' : [n for n in range(100,1001,50)]
+    'n_estimators' : [n for n in range(100,1001,100)]
 }
 
 m4_grid_2 = GridSearchCV(best_model4, param_grid=m4_params2, scoring=scorer, cv=5, verbose=0, n_jobs=4)
