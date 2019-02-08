@@ -3,7 +3,7 @@ from utils.data_loader import train_data_loader, test_data_loader
 import xgboost as xgb
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression, Lasso, RidgeClassifier, ElasticNet, Lars, LassoLars
+from sklearn.linear_model import LogisticRegression, Lasso, RidgeClassifier, SGDClassifier, Lars, LassoLars
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import fbeta_score, make_scorer
 
@@ -18,7 +18,7 @@ warnings.filterwarnings('ignore')
 
 # Print Current Time
 time = str(datetime.datetime.now()).split()[1].split('.')[0]
-print("---------- Strart ----------")
+print("---------- Start ----------")
 print("Start:", time, "\n")
 
 
@@ -60,22 +60,33 @@ print("\n---------- Start Train ----------")
 
 #########
 ## scorer
+def new_scorer(y_true, y_pred, threshold=0.5) :
+    result = []
+
+    for pred in list(y_pred) :
+        if pred >= threshold :
+            result.append(1)
+        else :
+            result.append(0)
+            
+    return fbeta_score(y_true, np.array(result), beta=0.5)
+
 scorer = make_scorer(fbeta_score, beta=0.5)
 
 #########
 ## model1
 print("model1")
-model1 = xgb.XGBClassifier(n_jobs=4)
+model1 = xgb.XGBClassifier()
 
 m1_params1 = {
-    'max_depth' : [3,5,7,9],
+    'max_depth' : [3,4,5,7,9],
     'min_child_weight' : [0.5, 1],
-    'gamma' : [0, 0.1],
-    'subsample' : [0.5, 0.7, 0.9],
-    'colsample_bytree' : [0.5, 0.7, 0.9],
+    'gamma' : [0, 0.1, 0.5, 1, 1.5, 2, 5],
+    'subsample' : [0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+    'colsample_bytree' : [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 }
 
-m1_grid_1 = GridSearchCV(model1, param_grid=m1_params1, scoring=scorer, cv=5, verbose=0, n_jobs=4)
+m1_grid_1 = GridSearchCV(model1, param_grid=m1_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
 m1_grid_1.fit(X_train, y_train)
 
 best_model1 = m1_grid_1.best_estimator_
@@ -88,7 +99,7 @@ m1_params2 = {
     'n_estimators' : [n for n in range(500,1501,200)]
 }
 
-m1_grid_2 = GridSearchCV(best_model1, param_grid=m1_params2, scoring=scorer, cv=5, verbose=0, n_jobs=4)
+m1_grid_2 = GridSearchCV(best_model1, param_grid=m1_params2, scoring=scorer, cv=2, verbose=0, n_jobs=4)
 m1_grid_2.fit(X_train, y_train)
 
 best_model1 = m1_grid_2.best_estimator_
@@ -107,7 +118,7 @@ m2_params1 = {
     'degree' : [2,3,4]
 }
 
-m2_grid_1 = GridSearchCV(model2, param_grid=m2_params1, scoring=scorer, cv=5, verbose=0, n_jobs=4)
+m2_grid_1 = GridSearchCV(model2, param_grid=m2_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
 m2_grid_1.fit(X_train, y_train)
 
 best_model2 = m2_grid_1.best_estimator_
@@ -125,7 +136,7 @@ m3_params1 = {
     'max_iter' : [n for n in range(100,1101, 200)]
 }
 
-m3_grid_1 = GridSearchCV(model3, param_grid=m3_params1, scoring=scorer, cv=5, verbose=0, n_jobs=4)
+m3_grid_1 = GridSearchCV(model3, param_grid=m3_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
 m3_grid_1.fit(X_train, y_train)
 
 best_model3 = m3_grid_1.best_estimator_
@@ -136,14 +147,14 @@ print("Best Params : {}".format(m3_grid_1.best_params_))
 #########
 ## model4
 print("\nmodel4")
-model4 = RandomForestClassifier(n_jobs=4)
+model4 = RandomForestClassifier()
 
 m4_params1 = {
     'max_depth' : [n for n in range(10, 51, 10)],
     'min_samples_leaf': [1, 2, 3, 4, 5,10, 20, 50]
 }
 
-m4_grid_1 = GridSearchCV(model4, param_grid=m4_params1, scoring=scorer, cv=5, verbose=0, n_jobs=4)
+m4_grid_1 = GridSearchCV(model4, param_grid=m4_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
 m4_grid_1.fit(X_train, y_train)
 
 best_model4 = m4_grid_1.best_estimator_
@@ -155,7 +166,7 @@ m4_params2 = {
     'n_estimators' : [n for n in range(100,1001,100)]
 }
 
-m4_grid_2 = GridSearchCV(best_model4, param_grid=m4_params2, scoring=scorer, cv=5, verbose=0, n_jobs=4)
+m4_grid_2 = GridSearchCV(best_model4, param_grid=m4_params2, scoring=scorer, cv=2, verbose=0, n_jobs=4)
 m4_grid_2.fit(X_train, y_train)
 
 best_model4 = m4_grid_2.best_estimator_
@@ -166,14 +177,15 @@ print("Best Params : {}".format(m4_grid_2.best_params_))
 #########
 ## model5
 print("\nmodel5")
-model5 = LogisticRegression(n_jobs=4, penalty="l1")
+model5 = LogisticRegression()
 
 m5_params1 = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100],
-    'max_iter' : [n for n in range(100,1101, 200)]
+    'max_iter' : [n for n in range(100,1101, 200)],
+    'penalty' : ["l1"]
 }
 
-m5_grid_1 = GridSearchCV(model5, param_grid=m5_params1, scoring=scorer, cv=5, verbose=0, n_jobs=4)
+m5_grid_1 = GridSearchCV(model5, param_grid=m5_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
 m5_grid_1.fit(X_train, y_train)
 
 best_model5 = m3_grid_1.best_estimator_
@@ -191,7 +203,7 @@ m6_params1 = {
     'max_iter' : [None]+[n for n in range(100,1101, 200)]
 }
 
-m6_grid_1 = GridSearchCV(model6, param_grid=m6_params1, scoring=scorer, cv=5, verbose=0, n_jobs=4)
+m6_grid_1 = GridSearchCV(model6, param_grid=m6_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
 m6_grid_1.fit(X_train, y_train)
 
 best_model6 = m6_grid_1.best_estimator_
@@ -202,15 +214,16 @@ print("Best Params : {}".format(m6_grid_1.best_params_))
 #########
 ## model7
 print("\nmodel7")
-model7 = ElasticNet()
+model7 = SGDClassifier()
 
 m7_params1 = {
-    'alpha': [0.1, 1, 2, 5, 10, 20, 50, 100],
-    'l1_ratio':[0.3, 0.4, 0.5, 0.6], 
-    'max_iter' : [n for n in range(800, 1601, 200)]
+    'alpha': [0.001, 0.01, 0.1, 1, 2, 5, 10, 20, 50, 100],
+    'l1_ratio':[0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7], 
+    'max_iter' : [None]+[n for n in range(800, 1601, 200)],
+    'penalty' : ["elasticnet"]
 }
 
-m7_grid_1 = GridSearchCV(model7, param_grid=m7_params1, scoring=scorer, cv=5, verbose=0, n_jobs=4)
+m7_grid_1 = GridSearchCV(model7, param_grid=m7_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
 m7_grid_1.fit(X_train, y_train)
 
 best_model7 = m7_grid_1.best_estimator_
@@ -224,15 +237,29 @@ print("\nmodel8")
 model8 = Lars()
 
 m8_params1 = {
-    'n_nonzero_coefs': [n for n in range(30, 150, 20)],
+    'n_nonzero_coefs': [n for n in range(30, 150, 20)]
 }
 
-m8_grid_1 = GridSearchCV(model8, param_grid=m8_params1, scoring=scorer, cv=5, verbose=0, n_jobs=4)
-m8_grid_1.fit(X_train, y_train)
+max_score=0
+m8_best_t = 0
+best_model8 = ""
+m8_best_grid_1 = ""
 
+for t in [0, 0.05, 0.1, 0.2, 0.25, 0.3, 0.45, 0.4, 0.45, 0.5, 0.6] :
+    scorer2 = make_scorer(new_scorer, threshold=t)
+    m8_grid_1 = GridSearchCV(model8, param_grid=m8_params1, scoring=scorer2, cv=2, verbose=0, n_jobs=4)
+    m8_grid_1.fit(X_train, y_train)
+
+    if max_score < m8_grid_1.best_score_ :
+        best_model8 = m8_grid_1.best_estimator_
+        m8_best_t = t
+        m8_best_grid_1 = m8_grid_1
+        
+m8_grid_1 = m8_best_grid_1
 best_model8 = m8_grid_1.best_estimator_
 
-print("Best Score : {}".format(m8_grid_1.best_score_))
+print("Best Score : {}".format(m8_grid_1.best_score_))     
+print("Threshold :", m8_best_t)
 print("Best Params : {}".format(m8_grid_1.best_params_))
 
 #########
@@ -245,12 +272,25 @@ m9_params1 = {
     'max_iter' : [n for n in range(800, 1601, 200)]
 }
 
-m9_grid_1 = GridSearchCV(model9, param_grid=m9_params1, scoring=scorer, cv=5, verbose=0, n_jobs=4)
-m9_grid_1.fit(X_train, y_train)
+max_score=0
+m9_best_t = 0
+best_model9 = ""
+m9_best_grid_1 = ""
+for t in [0, 0.05, 0.1, 0.2, 0.25, 0.3, 0.45, 0.4, 0.45, 0.5, 0.6] :
+    scorer2 = make_scorer(new_scorer, threshold=t)
+    m9_grid_1 = GridSearchCV(model9, param_grid=m9_params1, scoring=scorer2, cv=2, verbose=0, n_jobs=4)
+    m9_grid_1.fit(X_train, y_train)
 
+    if max_score < m9_grid_1.best_score_ :
+        best_model9 = m9_grid_1.best_estimator_
+        m9_best_t = t
+        m9_best_grid_1 = m9_grid_1
+
+m9_grid_1 = m9_best_grid_1
 best_model9 = m9_grid_1.best_estimator_
 
-print("Best Score : {}".format(m9_grid_1.best_score_))
+print("Best Score : {}".format(m9_grid_1.best_score_))     
+print("Threshold :", m9_best_t)
 print("Best Params : {}".format(m9_grid_1.best_params_))
 
 

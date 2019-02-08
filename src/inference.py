@@ -4,7 +4,7 @@ from utils.inference_tools import pred_to_binary, export_csv
 import xgboost as xgb
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression, Lasso, RidgeClassifier, ElasticNet, Lars, LassoLars
+from sklearn.linear_model import LogisticRegression, Lasso, RidgeClassifier, SGDClassifier, Lars, LassoLars
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import fbeta_score, make_scorer
 
