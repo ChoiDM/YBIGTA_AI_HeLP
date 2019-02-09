@@ -40,9 +40,7 @@ X_test, patient_num = test_data_loader(test_dir, do_n4, do_ws, do_resample, do_s
 
 
 # Load trained model
-print("\n---------- Model Load ----------")
-threshold = 0.65
-
+print("\n---------- ML Model Load ----------")
 model1 = pickle.load(open('/data/model/model1.pickle.dat', 'rb'))
 model2 = pickle.load(open('/data/model/model2.pickle.dat', 'rb'))
 model3 = pickle.load(open('/data/model/model3.pickle.dat', 'rb'))
@@ -53,16 +51,9 @@ model7 = pickle.load(open('/data/model/model7.pickle.dat', 'rb'))
 model8 = pickle.load(open('/data/model/model8.pickle.dat', 'rb'))
 model9 = pickle.load(open('/data/model/model9.pickle.dat', 'rb'))
 
-with open('/data/model/model_architecture.json', 'r') as f :
-    meta = model_from_json(f.read())
 
-meta.load_weights('/data/model/model_weights.h5')
-
-
-# Make Predictions for Test Data
-print("\n---------- Inference ----------")
-print("Threshold :", threshold)
-
+# Stacking model
+print("\n---------- Model Stacking ----------")
 def stacking(models, data) : 
     result = []
     
@@ -73,10 +64,32 @@ def stacking(models, data) :
 
 models = [model1, model2, model3, model4, model5, model6, model7, model8, model9]
 S_test = stacking(models, X_test)
+print(S_test)
+
+
+# Load stacking model
+print("\n---------- Model Stacking ----------")
+from keras.models import Sequential, model_from_json
+from keras.layers import Dense
+from keras.wrappers.scikit_learn import KerasClassifier
+from keras.utils import np_utils
+
+with open('/data/model/model_architecture.json', 'r') as f :
+    meta = model_from_json(f.read())
+
+meta.model.load_weights('/data/model/model_weights.h5')
+
+
+# Make Predictions for Test Data
+threshold = 0.65
+print("\n---------- Inference ----------")
+print("Threshold :", threshold)
 
 y_pred = meta.predict_proba(S_test)[:, 1]
 y_pred_binary = pred_to_binary(y_pred, threshold = threshold)
+print(y_pred_binary)
 
 
 # Make 'output.csv'
 export_csv(patient_num, y_pred_binary, y_pred)
+

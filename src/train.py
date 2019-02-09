@@ -55,8 +55,8 @@ X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample
 #### Modify here ####
 
 
-# Fit Model with Training Data
-print("\n---------- Start Train ----------")
+# Fit ML model with training data
+print("\n---------- Start ML Train ----------")
 
 #########
 ## scorer
@@ -294,38 +294,8 @@ print("Threshold :", m9_best_t)
 print("Best Params : {}".format(m9_grid_1.best_params_))
 
 
-# Model Stacking
-print("\n---------- Model Stacking ----------")
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.wrappers.scikit_learn import KerasClassifier
-from keras.utils import np_utils
-
-def stacking(models, data) : 
-    result = []
-    
-    for model in models :
-        result.append(model.predict_proba(data))
-        
-    return np.array(result).T
-
-def stack_fn(num_models=9):
-    model = Sequential()
-    model.add(Dense(16, input_dim=num_models, activation='relu'))
-    model.add(Dense(2, activation='softmax'))
-
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    return model
-
-models = [best_model1, best_model2, best_model3, best_model4, best_model5, best_model6, best_model7, best_model8, best_model9]
-S_train = stacking(models, X_train)
-
-meta_model = KerasClassifier(build_fn=stack_fn)
-meta_model.fit(S_train, y_train)
-
-
-# Save model to file
-print("\n---------- Save Stacking ----------")
+# Save ML model
+print("\n---------- Save ML Model ----------")
 pickle.dump(model1, open('/data/model/model1.pickle.dat', 'wb'))
 pickle.dump(model2, open('/data/model/model2.pickle.dat', 'wb'))
 pickle.dump(model3, open('/data/model/model3.pickle.dat', 'wb'))
@@ -336,10 +306,45 @@ pickle.dump(model7, open('/data/model/model7.pickle.dat', 'wb'))
 pickle.dump(model8, open('/data/model/model8.pickle.dat', 'wb'))
 pickle.dump(model9, open('/data/model/model9.pickle.dat', 'wb'))
 
+
+# Model Stacking
+print("\n---------- Model Stacking ----------")
+def stacking(models, data) : 
+    result = []
+    
+    for model in models :
+        result.append(model.predict_proba(data))
+        
+    return np.array(result).T
+
+models = [best_model1, best_model2, best_model3, best_model4, best_model5, best_model6, best_model7, best_model8, best_model9]
+S_train = stacking(models, X_train)
+print(S_train)
+
+# Fit stacking model
+print("\n---------- Start Staking Train ----------")
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.wrappers.scikit_learn import KerasClassifier
+from keras.utils import np_utils
+
+def stack_fn(num_models=9):
+    model = Sequential()
+    model.add(Dense(16, input_dim=num_models, activation='relu'))
+    model.add(Dense(2, activation='softmax'))
+
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    return model
+
+meta_model = KerasClassifier(build_fn=stack_fn)
+meta_model.fit(S_train, y_train)
+
+
+# Save stacking model
 meta_model.model.save_weights('/data/model/model_weights.h5')
 
 with open('/data/model/model_architecture.json', 'w') as f :
-    f.write(meta_model.to_json())
+    f.write(meta_model.model.to_json())
 
 
 
