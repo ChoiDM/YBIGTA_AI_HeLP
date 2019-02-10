@@ -83,7 +83,8 @@ m1_params1 = {
     'min_child_weight' : [0.5, 1],
     'gamma' : [0, 0.1, 0.5, 1, 1.5, 2, 5],
     'subsample' : [0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
-    'colsample_bytree' : [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    'colsample_bytree' : [0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+    'probability' : True
 }
 
 m1_grid_1 = GridSearchCV(model1, param_grid=m1_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
@@ -115,7 +116,8 @@ model2 = SVC()
 m2_params1 = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100], 
     'gamma' : [0.001, 0.01, 0.1, 1, 2, 5, 10, 20],
-    'degree' : [2,3,4]
+    'degree' : [2,3,4],
+    'probability' : True
 }
 
 m2_grid_1 = GridSearchCV(model2, param_grid=m2_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
@@ -133,7 +135,8 @@ model3 = LogisticRegression()
 
 m3_params1 = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100],
-    'max_iter' : [n for n in range(100,1101, 200)]
+    'max_iter' : [n for n in range(100,1101, 200)],
+    'probability' : True
 }
 
 m3_grid_1 = GridSearchCV(model3, param_grid=m3_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
@@ -151,7 +154,8 @@ model4 = RandomForestClassifier()
 
 m4_params1 = {
     'max_depth' : [n for n in range(10, 51, 10)],
-    'min_samples_leaf': [1, 2, 3, 4, 5,10, 20, 50]
+    'min_samples_leaf': [1, 2, 3, 4, 5,10, 20, 50],
+    'probability' : True
 }
 
 m4_grid_1 = GridSearchCV(model4, param_grid=m4_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
@@ -182,7 +186,8 @@ model5 = LogisticRegression()
 m5_params1 = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100],
     'max_iter' : [n for n in range(100,1101, 200)],
-    'penalty' : ["l1"]
+    'penalty' : ["l1"],
+    'probability' : True
 }
 
 m5_grid_1 = GridSearchCV(model5, param_grid=m5_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
@@ -200,7 +205,8 @@ model6 = RidgeClassifier()
 
 m6_params1 = {
     'alpha': [0.1, 1, 2, 5, 10, 20, 50, 100],
-    'max_iter' : [None]+[n for n in range(100,1101, 200)]
+    'max_iter' : [None]+[n for n in range(100,1101, 200)],
+    'probability' : True
 }
 
 m6_grid_1 = GridSearchCV(model6, param_grid=m6_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
@@ -220,7 +226,8 @@ m7_params1 = {
     'alpha': [0.001, 0.01, 0.1, 1, 2, 5, 10, 20, 50, 100],
     'l1_ratio':[0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7], 
     'max_iter' : [None]+[n for n in range(800, 1601, 200)],
-    'penalty' : ["elasticnet"]
+    'penalty' : ["elasticnet"],
+    'probability' : True
 }
 
 m7_grid_1 = GridSearchCV(model7, param_grid=m7_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
@@ -269,7 +276,8 @@ model9 = LassoLars()
 
 m9_params1 = {
     'alpha': [0.1, 1, 2, 5, 10, 20, 50, 100],
-    'max_iter' : [n for n in range(800, 1601, 200)]
+    'max_iter' : [n for n in range(800, 1601, 200)],
+    'probability' : True
 }
 
 max_score=0
