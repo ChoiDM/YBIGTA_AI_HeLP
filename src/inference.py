@@ -1,7 +1,7 @@
 from utils.data_loader import test_data_loader
 from utils.inference_tools import pred_to_binary, export_csv
 
-import xgboost as xgb
+from xgboost import XGBClassifier
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression, Lasso, RidgeClassifier, SGDClassifier, Lars, LassoLars
