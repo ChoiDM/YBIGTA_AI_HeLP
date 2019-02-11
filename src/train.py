@@ -86,7 +86,7 @@ m1_params1 = {
     'colsample_bytree' : [0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
     'probability' : [True],
     'learning_rate' : [0.01, 0.05, 0.07, 0.1, 0.2],
-    'n_estimators' : [n for n in range(500,1501,200)]
+    'n_estimators' : [n for n in range(100,1101,200)]
 }
 
 m1_grid_1 = GridSearchCV(model1, param_grid=m1_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
