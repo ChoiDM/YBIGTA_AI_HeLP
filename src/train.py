@@ -2,7 +2,7 @@ from utils.data_loader import train_data_loader, test_data_loader
 
 from xgboost import XGBClassifier
 from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 from sklearn.linear_model import LogisticRegression, Lasso, RidgeClassifier, SGDClassifier, Lars, LassoLars
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import fbeta_score, make_scorer
@@ -79,17 +79,17 @@ print("model1")
 model1 = XGBClassifier()
 
 m1_params1 = {
-    'max_depth' : [3,4,5,7,9],
-    'min_child_weight' : [0.5, 1],
-    'gamma' : [0, 0.1, 0.5, 1, 1.5, 2, 5],
-    'subsample' : [0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
-    'colsample_bytree' : [0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+    'max_depth' : [3,5,7,9],
+    'min_child_weight' : [0.5, 1, 5, 10],
+    'gamma' : [0, 0.5, 1, 1.5, 2, 5],
+    'subsample' : [0.5, 0.6, 0.8, 1.0],
+    'colsample_bytree' : [0.5, 0.6, 0.8, 1.0],
     'probability' : [True],
-    'learning_rate' : [0.01, 0.05, 0.07, 0.1, 0.2],
-    'n_estimators' : [n for n in range(100,1101,200)]
+    'learning_rate' : [0.01, 0.05, 0.1],
+    'n_estimators' : [100, 300, 500]
 }
 
-m1_grid_1 = GridSearchCV(model1, param_grid=m1_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
+m1_grid_1 = GridSearchCV(model1, param_grid=m1_params1, scoring=scorer, cv=2, verbose=2, n_jobs=-1)
 m1_grid_1.fit(X_train, y_train)
 
 best_model1 = m1_grid_1.best_estimator_
@@ -109,7 +109,7 @@ m2_params1 = {
     'probability' : [True]
 }
 
-m2_grid_1 = GridSearchCV(model2, param_grid=m2_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
+m2_grid_1 = GridSearchCV(model2, param_grid=m2_params1, scoring=scorer, cv=2, verbose=0, n_jobs=-1)
 m2_grid_1.fit(X_train, y_train)
 
 best_model2 = m2_grid_1.best_estimator_
@@ -128,7 +128,7 @@ m3_params1 = {
     'probability' : [True]
 }
 
-m3_grid_1 = GridSearchCV(model3, param_grid=m3_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
+m3_grid_1 = GridSearchCV(model3, param_grid=m3_params1, scoring=scorer, cv=2, verbose=0, n_jobs=-1)
 m3_grid_1.fit(X_train, y_train)
 
 best_model3 = m3_grid_1.best_estimator_
@@ -142,13 +142,13 @@ print("\nmodel4")
 model4 = RandomForestClassifier()
 
 m4_params1 = {
-    'max_depth' : [n for n in range(10, 51, 10)],
+    'max_depth' : [6, 8, 10, 15, 20, 30, 40, 50],
     'min_samples_leaf': [1, 2, 3, 4, 5,10, 20, 50],
     'probability' : [True],
-    'n_estimators' : [n for n in range(100,1001,100)]
+    'n_estimators' : [100, 300, 500]
 }
 
-m4_grid_1 = GridSearchCV(model4, param_grid=m4_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
+m4_grid_1 = GridSearchCV(model4, param_grid=m4_params1, scoring=scorer, cv=2, verbose=2, n_jobs=-1)
 m4_grid_1.fit(X_train, y_train)
 
 best_model4 = m4_grid_1.best_estimator_
@@ -168,7 +168,7 @@ m5_params1 = {
     'probability' : [True]
 }
 
-m5_grid_1 = GridSearchCV(model5, param_grid=m5_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
+m5_grid_1 = GridSearchCV(model5, param_grid=m5_params1, scoring=scorer, cv=2, verbose=0, n_jobs=-1)
 m5_grid_1.fit(X_train, y_train)
 
 best_model5 = m3_grid_1.best_estimator_
@@ -187,7 +187,7 @@ m6_params1 = {
     'probability' : [True]
 }
 
-m6_grid_1 = GridSearchCV(model6, param_grid=m6_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
+m6_grid_1 = GridSearchCV(model6, param_grid=m6_params1, scoring=scorer, cv=2, verbose=0, n_jobs=-1)
 m6_grid_1.fit(X_train, y_train)
 
 best_model6 = m6_grid_1.best_estimator_
@@ -208,7 +208,7 @@ m7_params1 = {
     'probability' : [True]
 }
 
-m7_grid_1 = GridSearchCV(model7, param_grid=m7_params1, scoring=scorer, cv=2, verbose=0, n_jobs=4)
+m7_grid_1 = GridSearchCV(model7, param_grid=m7_params1, scoring=scorer, cv=2, verbose=0, n_jobs=-1)
 m7_grid_1.fit(X_train, y_train)
 
 best_model7 = m7_grid_1.best_estimator_
@@ -233,7 +233,7 @@ m8_best_grid_1 = ""
 
 for t in [0, 0.05, 0.1, 0.2, 0.25, 0.3, 0.45, 0.4, 0.45, 0.5, 0.6] :
     scorer2 = make_scorer(new_scorer, threshold=t)
-    m8_grid_1 = GridSearchCV(model8, param_grid=m8_params1, scoring=scorer2, cv=2, verbose=0, n_jobs=4)
+    m8_grid_1 = GridSearchCV(model8, param_grid=m8_params1, scoring=scorer2, cv=2, verbose=0, n_jobs=-1)
     m8_grid_1.fit(X_train, y_train)
 
     if max_score < m8_grid_1.best_score_ :
@@ -265,7 +265,7 @@ best_model9 = ""
 m9_best_grid_1 = ""
 for t in [0, 0.05, 0.1, 0.2, 0.25, 0.3, 0.45, 0.4, 0.45, 0.5, 0.6] :
     scorer2 = make_scorer(new_scorer, threshold=t)
-    m9_grid_1 = GridSearchCV(model9, param_grid=m9_params1, scoring=scorer2, cv=2, verbose=0, n_jobs=4)
+    m9_grid_1 = GridSearchCV(model9, param_grid=m9_params1, scoring=scorer2, cv=2, verbose=0, n_jobs=-1)
     m9_grid_1.fit(X_train, y_train)
 
     if max_score < m9_grid_1.best_score_ :
@@ -280,6 +280,25 @@ print("Best Score : {}".format(m9_grid_1.best_score_))
 print("Threshold :", m9_best_t)
 print("Best Params : {}".format(m9_grid_1.best_params_))
 
+##########
+## model10
+print("\nmodel10")
+model10 = ExtraTreesClassifier()
+
+m10_params1 = {
+    'max_depth' : [None, 3,5,7,9],
+    'probability' : [True],
+    'n_estimators' : [10, 50, 100, 300, 500]
+}
+
+m10_grid_1 = GridSearchCV(model10, param_grid=m10_params1, scoring=scorer, cv=2, verbose=2, n_jobs=-1)
+m10_grid_1.fit(X_train, y_train)
+
+best_model10 = m10_grid_1.best_estimator_
+
+print("Best Score : {}".format(m10_grid_1.best_score_))
+print("Best Params : {}".format(m10_grid_1.best_params_))
+
 
 # Save ML model
 print("\n---------- Save ML Model ----------")
@@ -292,7 +311,7 @@ pickle.dump(model6, open('/data/model/model6.pickle.dat', 'wb'))
 pickle.dump(model7, open('/data/model/model7.pickle.dat', 'wb'))
 pickle.dump(model8, open('/data/model/model8.pickle.dat', 'wb'))
 pickle.dump(model9, open('/data/model/model9.pickle.dat', 'wb'))
-
+pickle.dump(model10, open('/data/model/model10.pickle.dat', 'wb'))
 
 # Model Stacking
 print("\n---------- Model Stacking ----------")
@@ -304,7 +323,7 @@ def stacking(models, data) :
         
     return np.array(result).T
 
-models = [best_model1, best_model2, best_model3, best_model4, best_model5, best_model6, best_model7, best_model8, best_model9]
+models = [best_model1, best_model2, best_model3, best_model4, best_model5, best_model6, best_model7, best_model8, best_model9, best_model10]
 S_train = stacking(models, X_train)
 print(S_train)
 
@@ -315,7 +334,7 @@ from keras.layers import Dense
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.utils import np_utils
 
-def stack_fn(num_models=9):
+def stack_fn(num_models=10):
     model = Sequential()
     model.add(Dense(16, input_dim=num_models, activation='relu'))
     model.add(Dense(2, activation='softmax'))
@@ -324,7 +343,7 @@ def stack_fn(num_models=9):
     return model
 
 meta_model = KerasClassifier(build_fn=stack_fn)
-meta_model.fit(S_train, y_train)
+meta_model.fit(S_train, y_train, epochs=15)
 
 
 # Save stacking model

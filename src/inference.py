@@ -3,7 +3,7 @@ from utils.inference_tools import pred_to_binary, export_csv
 
 from xgboost import XGBClassifier
 from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 from sklearn.linear_model import LogisticRegression, Lasso, RidgeClassifier, SGDClassifier, Lars, LassoLars
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import fbeta_score, make_scorer
@@ -50,6 +50,7 @@ model6 = pickle.load(open('/data/model/model6.pickle.dat', 'rb'))
 model7 = pickle.load(open('/data/model/model7.pickle.dat', 'rb'))
 model8 = pickle.load(open('/data/model/model8.pickle.dat', 'rb'))
 model9 = pickle.load(open('/data/model/model9.pickle.dat', 'rb'))
+model10 = pickle.load(open('/data/model/model10.pickle.dat', 'rb'))
 
 
 # Stacking model
@@ -62,7 +63,7 @@ def stacking(models, data) :
         
     return np.array(result).T
 
-models = [model1, model2, model3, model4, model5, model6, model7, model8, model9]
+models = [model1, model2, model3, model4, model5, model6, model7, model8, model9, model10]
 S_test = stacking(models, X_test)
 print(S_test)
 
@@ -81,7 +82,7 @@ meta.model.load_weights('/data/model/model_weights.h5')
 
 
 # Make Predictions for Test Data
-threshold = 0.65
+threshold = 0.6
 print("\n---------- Inference ----------")
 print("Threshold :", threshold)
 
