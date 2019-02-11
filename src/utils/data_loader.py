@@ -77,7 +77,7 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
 
             # Pre-processing (3)- White-stripe Normalization
             if do_ws:
-                ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
+                # ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
 
                 time = str(datetime.datetime.now()).split()[1].split('.')[0]
@@ -176,7 +176,7 @@ def train_data_loader(pos_dir = '/data/train/positive/', neg_dir = '/data/train/
 
             # Pre-processing (3)- White-stripe Normalization
             if do_ws:
-                ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
+                # ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
 
                 time = time = str(datetime.datetime.now()).split()[1].split('.')[0]
@@ -306,7 +306,7 @@ def test_data_loader(test_dir = '/data/test/', do_n4 = True, do_ws = True, do_re
 
         # Pre-processing (3)- White-stripe Normalization
         if do_ws:
-            ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
+            # ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
             FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
 
             time = str(datetime.datetime.now()).split()[1].split('.')[0]
