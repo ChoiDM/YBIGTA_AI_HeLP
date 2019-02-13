@@ -295,16 +295,16 @@ print("Best Params : {}".format(m10_grid_1.best_params_))
 
 # Save ML model
 print("\n---------- Save ML Model ----------")
-pickle.dump(model1, open('/data/model/model1.pickle.dat', 'wb'))
-pickle.dump(model2, open('/data/model/model2.pickle.dat', 'wb'))
-pickle.dump(model3, open('/data/model/model3.pickle.dat', 'wb'))
-pickle.dump(model4, open('/data/model/model4.pickle.dat', 'wb'))
-pickle.dump(model5, open('/data/model/model5.pickle.dat', 'wb'))
-pickle.dump(model6, open('/data/model/model6.pickle.dat', 'wb'))
-pickle.dump(model7, open('/data/model/model7.pickle.dat', 'wb'))
-pickle.dump(model8, open('/data/model/model8.pickle.dat', 'wb'))
-pickle.dump(model9, open('/data/model/model9.pickle.dat', 'wb'))
-pickle.dump(model10, open('/data/model/model10.pickle.dat', 'wb'))
+pickle.dump(best_model1, open('../data/model/model1.pickle.dat', 'wb'))
+pickle.dump(best_model2, open('../data/model/model2.pickle.dat', 'wb'))
+pickle.dump(best_model3, open('../data/model/model3.pickle.dat', 'wb'))
+pickle.dump(best_model4, open('../data/model/model4.pickle.dat', 'wb'))
+pickle.dump(best_model5, open('../data/model/model5.pickle.dat', 'wb'))
+pickle.dump(best_model6, open('../data/model/model6.pickle.dat', 'wb'))
+pickle.dump(best_model7, open('../data/model/model7.pickle.dat', 'wb'))
+pickle.dump(best_model8, open('../data/model/model8.pickle.dat', 'wb'))
+pickle.dump(best_model9, open('../data/model/model9.pickle.dat', 'wb'))
+pickle.dump(best_model10, open('../data/model/model10.pickle.dat', 'wb'))
 
 # Model Stacking
 print("\n---------- Model Stacking ----------")
@@ -312,7 +312,9 @@ def stacking(models, data) :
     result = []
     
     for idx, model in enumerate(models) :
-        if idx+1 in [6,8,9] :
+        if idx+1 in [2,9] :
+            continue
+        if idx+1 in [6,8] :
             result.append(model.predict(data))
         else :
             result.append(model.predict_proba(data)[:,1])
@@ -331,7 +333,7 @@ from keras.layers import Dense
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.utils import np_utils
 
-def stack_fn(num_models=10):
+def stack_fn(num_models=8):
     model = Sequential()
     model.add(Dense(16, input_dim=num_models, activation='relu'))
     model.add(Dense(2, activation='softmax'))
@@ -340,7 +342,7 @@ def stack_fn(num_models=10):
     return model
 
 meta_model = KerasClassifier(build_fn=stack_fn)
-meta_model.fit(S_train, y_train, epochs=20)
+meta_model.fit(S_train, y_train, epochs=30)
 
 
 # Save stacking model

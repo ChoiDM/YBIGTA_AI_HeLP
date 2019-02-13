@@ -59,7 +59,9 @@ def stacking(models, data) :
     result = []
     
     for idx, model in enumerate(models) :
-        if idx+1 in [6,8,9] :
+        if idx+1 in [2,9] :
+            continue
+        if idx+1 in [6,8] :
             result.append(model.predict(data))
         else :
             result.append(model.predict_proba(data)[:,1])
