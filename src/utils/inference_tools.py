@@ -18,3 +18,7 @@ def export_csv(patient_num, y_pred_binary, y_pred, path="/data/output/"):
 
     final_df = pd.DataFrame(values)
     final_df.to_csv(path+'output.csv', sep = ',', header = False, index = False)
+    
+    
+    print('--------------------------------')
+    print(final_df)
