@@ -113,8 +113,6 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
             patient_num.append(pos_patient)
 
 
-            df = pd.DataFrame(np.array(total_values), columns = total_columns)
-
         except Exception as ex:
             time = str(datetime.datetime.now()).split()[1].split('.')[0]
             print("Error !!! [Patient Number : {}] ({})".format(i + 1, time))
@@ -205,7 +203,6 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
             y.append(0)
             patient_num.append(neg_patient)
 
-            df += pd.DataFrame(np.array(total_values), columns=total_columns)
 
         except Exception as ex:
             time = str(datetime.datetime.now()).split()[1].split('.')[0]
@@ -226,10 +223,10 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
     print("Created X of shape {} and y of shape {} ({})".format(X.shape, y.shape, time))
 
     if return_patient_num:
-        return X, y, df, patient_num
+        return X, y, patient_num
 
     else:
-        return X, y, df
+        return X, y
 
 
 # Feature Extraction for Inference
