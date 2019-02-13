@@ -89,7 +89,7 @@ m1_params1 = {
     'n_estimators' : [100, 300, 500]
 }
 
-m1_grid_1 = GridSearchCV(model1, param_grid=m1_params1, scoring=scorer, cv=2, verbose=2, n_jobs=-1)
+m1_grid_1 = GridSearchCV(model1, param_grid=m1_params1, scoring=scorer, cv=2, verbose=0, n_jobs=-1)
 m1_grid_1.fit(X_train, y_train)
 
 best_model1 = m1_grid_1.best_estimator_
@@ -125,7 +125,6 @@ model3 = LogisticRegression()
 m3_params1 = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100],
     'max_iter' : [n for n in range(100,1101, 200)],
-    'probability' : [True]
 }
 
 m3_grid_1 = GridSearchCV(model3, param_grid=m3_params1, scoring=scorer, cv=2, verbose=0, n_jobs=-1)
@@ -144,11 +143,10 @@ model4 = RandomForestClassifier()
 m4_params1 = {
     'max_depth' : [6, 8, 10, 15, 20, 30, 40, 50],
     'min_samples_leaf': [1, 2, 3, 4, 5,10, 20, 50],
-    'probability' : [True],
     'n_estimators' : [100, 300, 500]
 }
 
-m4_grid_1 = GridSearchCV(model4, param_grid=m4_params1, scoring=scorer, cv=2, verbose=2, n_jobs=-1)
+m4_grid_1 = GridSearchCV(model4, param_grid=m4_params1, scoring=scorer, cv=2, verbose=0, n_jobs=-1)
 m4_grid_1.fit(X_train, y_train)
 
 best_model4 = m4_grid_1.best_estimator_
@@ -164,8 +162,7 @@ model5 = LogisticRegression()
 m5_params1 = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100],
     'max_iter' : [n for n in range(100,1101, 200)],
-    'penalty' : ["l1"],
-    'probability' : [True]
+    'penalty' : ["l1"]
 }
 
 m5_grid_1 = GridSearchCV(model5, param_grid=m5_params1, scoring=scorer, cv=2, verbose=0, n_jobs=-1)
@@ -183,8 +180,7 @@ model6 = RidgeClassifier()
 
 m6_params1 = {
     'alpha': [0.1, 1, 2, 5, 10, 20, 50, 100],
-    'max_iter' : [None]+[n for n in range(100,1101, 200)],
-    'probability' : [True]
+    'max_iter' : [None]+[n for n in range(100,1101, 200)]
 }
 
 m6_grid_1 = GridSearchCV(model6, param_grid=m6_params1, scoring=scorer, cv=2, verbose=0, n_jobs=-1)
@@ -205,7 +201,7 @@ m7_params1 = {
     'l1_ratio':[0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7], 
     'max_iter' : [None]+[n for n in range(800, 1601, 200)],
     'penalty' : ["elasticnet"],
-    'probability' : [True]
+    'loss' : ["log"]
 }
 
 m7_grid_1 = GridSearchCV(model7, param_grid=m7_params1, scoring=scorer, cv=2, verbose=0, n_jobs=-1)
@@ -222,8 +218,7 @@ print("\nmodel8")
 model8 = Lars()
 
 m8_params1 = {
-    'n_nonzero_coefs': [n for n in range(30, 150, 20)],
-    'probability' : [True]
+    'n_nonzero_coefs': [n for n in range(30, 150, 20)]
 }
 
 max_score=0
@@ -255,8 +250,7 @@ model9 = LassoLars()
 
 m9_params1 = {
     'alpha': [0.1, 1, 2, 5, 10, 20, 50, 100],
-    'max_iter' : [n for n in range(800, 1601, 200)],
-    'probability' : [True]
+    'max_iter' : [n for n in range(800, 1601, 200)]
 }
 
 max_score=0
@@ -286,12 +280,11 @@ print("\nmodel10")
 model10 = ExtraTreesClassifier()
 
 m10_params1 = {
-    'max_depth' : [None, 3,5,7,9],
-    'probability' : [True],
+    'max_depth' : [None, 3, 5, 7, 9],
     'n_estimators' : [10, 50, 100, 300, 500]
 }
 
-m10_grid_1 = GridSearchCV(model10, param_grid=m10_params1, scoring=scorer, cv=2, verbose=2, n_jobs=-1)
+m10_grid_1 = GridSearchCV(model10, param_grid=m10_params1, scoring=scorer, cv=2, verbose=0, n_jobs=-1)
 m10_grid_1.fit(X_train, y_train)
 
 best_model10 = m10_grid_1.best_estimator_
@@ -318,8 +311,12 @@ print("\n---------- Model Stacking ----------")
 def stacking(models, data) : 
     result = []
     
-    for model in models :
-        result.append(model.predict_proba(data))
+    for idx, model in enumerate(models) :
+        if idx+1 in [6,8,9] :
+            result.append(model.predict(data))
+        else :
+            result.append(model.predict_proba(data)[:,1])
+        print("model", idx+1, "is stacked")
         
     return np.array(result).T
 
@@ -343,7 +340,7 @@ def stack_fn(num_models=10):
     return model
 
 meta_model = KerasClassifier(build_fn=stack_fn)
-meta_model.fit(S_train, y_train, epochs=15)
+meta_model.fit(S_train, y_train, epochs=20)
 
 
 # Save stacking model

@@ -58,8 +58,12 @@ print("\n---------- Model Stacking ----------")
 def stacking(models, data) : 
     result = []
     
-    for model in models :
-        result.append(model.predict_proba(data))
+    for idx, model in enumerate(models) :
+        if idx+1 in [6,8,9] :
+            result.append(model.predict(data))
+        else :
+            result.append(model.predict_proba(data)[:,1])
+        print("model", idx+1, "is stacked")
         
     return np.array(result).T
 
