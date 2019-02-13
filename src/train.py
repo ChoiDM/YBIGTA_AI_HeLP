@@ -336,6 +336,7 @@ from keras.utils import np_utils
 def stack_fn(num_models=8):
     model = Sequential()
     model.add(Dense(16, input_dim=num_models, activation='relu'))
+    model.add(Dense(16, input_dim=16, activation='relu'))
     model.add(Dense(2, activation='softmax'))
 
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])

@@ -88,12 +88,13 @@ meta.model.load_weights('/data/model/model_weights.h5')
 
 
 # Make Predictions for Test Data
-threshold = 0.6
+threshold = 0.5
 print("\n---------- Inference ----------")
 print("Threshold :", threshold)
 
 y_pred = meta.predict_proba(S_test)[:, 1]
 y_pred_binary = pred_to_binary(y_pred, threshold = threshold)
+print(y_pred)
 print(y_pred_binary)
 
 
