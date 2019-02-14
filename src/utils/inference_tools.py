@@ -20,7 +20,7 @@ def pred_to_binary(pred_array, threshold = 0.5):
     return pred_binary
 
 
-def export_csv(patient_num, y_pred_binary, y_pred, path="/data/output/", index=None):
+def export_csv(patient_num, y_pred_binary, y_pred, path="/data", index=None):
     
     if index != None :
         y_pred_binary = y_pred_binary[index]
@@ -30,7 +30,7 @@ def export_csv(patient_num, y_pred_binary, y_pred, path="/data/output/", index=N
                 zip(patient_num, y_pred_binary, y_pred)]
 
     final_df = pd.DataFrame(values)
-    final_df.to_csv(path+'output.csv', sep = ',', header = False, index = False)
+    final_df.to_csv(path+'/output/output.csv', sep = ',', header = False, index = False)
     
     return final_df
 
