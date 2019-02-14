@@ -169,7 +169,7 @@ m5_params1 = {
 m5_grid_1 = GridSearchCV(model5, param_grid=m5_params1, scoring=scorer, cv=2, verbose=0, n_jobs=-1)
 m5_grid_1.fit(X_train, y_train)
 
-best_model5 = m3_grid_1.best_estimator_
+best_model5 = m5_grid_1.best_estimator_
 
 print("Best Score : {}".format(m5_grid_1.best_score_))
 print("Best Params : {}".format(m5_grid_1.best_params_))
@@ -313,9 +313,9 @@ def stacking(models, data) :
     result = []
     
     for idx, model in enumerate(models) :
-        if idx+1 in [2,9, 6, 7] :
+        if idx+1 in [2,6,7,8,9] :
             continue
-        if idx+1 in [8] :
+        if idx+1 in ["None"] :
             result.append(model.predict(data))
         else :
             result.append(model.predict_proba(data)[:,1])
@@ -334,7 +334,7 @@ from keras.layers import Dense
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.utils import np_utils
 
-def stack_fn(num_models=6):
+def stack_fn(num_models=len(S_train[0])):
     model = Sequential()
     model.add(Dense(16, input_dim=num_models, activation='relu'))
     model.add(Dense(16, input_dim=16, activation='relu'))

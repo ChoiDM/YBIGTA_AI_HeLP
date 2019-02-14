@@ -25,5 +25,5 @@ def making_df(S_train, meta, y_true):
 
     values = [list(s)+[m]+[y] for s,m,y in zip(S_train, meta, y_true)]
 
-    final_df = pd.DataFrame(values)
+    final_df = pd.DataFrame(values, columns =["model1", "model3", "model4", "model5", "model10", "meta", "y_true"])
     return final_df
