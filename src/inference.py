@@ -12,6 +12,7 @@ warnings.filterwarnings('ignore')
 test_dir = '/data/test/'
 
 features = ['firstorder', 'shape']
+target_voxel = (0.65, 0.65, 3)
 
 do_n4 = False
 do_ws = True
@@ -23,7 +24,8 @@ return_patient_num = True
 
 
 # Data Load
-X_test, patient_num = test_data_loader(test_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num, features)
+X_test, patient_num = test_data_loader(test_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num,
+                                       features, target_voxel)
 
 
 #########################################################################################################################
