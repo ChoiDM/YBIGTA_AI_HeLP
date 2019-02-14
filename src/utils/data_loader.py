@@ -15,7 +15,7 @@ from utils.FeatureExtract import feature_extract
 # Feature Extraction for Train
 def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/negative/', do_n4=True, do_ws=True,
                       do_resample=True,do_shuffle=True, save_to_disk=False, return_patient_num=False,
-                      features = ['firstorder', 'glcm', 'glszm', 'glrlm', 'ngtdm', 'shape']):
+                      features = ['firstorder', 'glcm', 'glszm', 'glrlm', 'ngtdm', 'shape'], target_voxel = (0.65, 0.65, 3)):
     # File List
     pos_file_list = glob(pos_dir + "*")
     neg_file_list = glob(neg_dir + "*")
@@ -48,10 +48,10 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
 
             # Pre-processing (1)- Resampling Voxel Size
             if do_resample:
-                ADC_array = resample(ADC_array, origin_voxel_size)
-                FLAIR_array = resample(FLAIR_array, origin_voxel_size)
-                BRAIN_array = resample(BRAIN_array, origin_voxel_size)
-                INFARCT_array = resample(INFARCT_array, origin_voxel_size)
+                ADC_array = resample(ADC_array, origin_voxel_size, target_voxel)
+                FLAIR_array = resample(FLAIR_array, origin_voxel_size, target_voxel)
+                BRAIN_array = resample(BRAIN_array, origin_voxel_size, target_voxel)
+                INFARCT_array = resample(INFARCT_array, origin_voxel_size, target_voxel)
 
                 time = str(datetime.datetime.now()).split()[1].split('.')[0]
                 print(">>> Finished : Voxel Size Resampling ({})".format(time))
@@ -139,10 +139,10 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
 
             # Pre-processing (1)- Resampling Voxel Size
             if do_resample:
-                ADC_array = resample(ADC_array, origin_voxel_size)
-                FLAIR_array = resample(FLAIR_array, origin_voxel_size)
-                BRAIN_array = resample(BRAIN_array, origin_voxel_size)
-                INFARCT_array = resample(INFARCT_array, origin_voxel_size)
+                ADC_array = resample(ADC_array, origin_voxel_size, target_voxel)
+                FLAIR_array = resample(FLAIR_array, origin_voxel_size, target_voxel)
+                BRAIN_array = resample(BRAIN_array, origin_voxel_size, target_voxel)
+                INFARCT_array = resample(INFARCT_array, origin_voxel_size, target_voxel)
 
                 time = str(datetime.datetime.now()).split()[1].split('.')[0]
                 print(">>> Finished : Voxel Size Resampling ({})".format(time))
@@ -233,7 +233,7 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
 # Feature Extraction for Inference
 def test_data_loader(test_dir='/data/test/', do_n4=True, do_ws=True, do_resample=True,
                      do_shuffle=False, save_to_disk=False, return_patient_num=False,
-                     features = ['firstorder', 'glcm', 'glszm', 'glrlm', 'ngtdm', 'shape']):
+                     features = ['firstorder', 'glcm', 'glszm', 'glrlm', 'ngtdm', 'shape'], target_voxel = (0.65, 0.65, 3)):
     # File List
     test_file_list = glob(test_dir + "*")
     test_patient_list = list(set([path.split('_')[0] for path in os.listdir(test_dir)]))
@@ -261,10 +261,10 @@ def test_data_loader(test_dir='/data/test/', do_n4=True, do_ws=True, do_resample
 
         # Pre-processing (1)- Resampling Voxel Size
         if do_resample:
-            ADC_array = resample(ADC_array, origin_voxel_size)
-            FLAIR_array = resample(FLAIR_array, origin_voxel_size)
-            BRAIN_array = resample(BRAIN_array, origin_voxel_size)
-            INFARCT_array = resample(INFARCT_array, origin_voxel_size)
+            ADC_array = resample(ADC_array, origin_voxel_size, target_voxel)
+            FLAIR_array = resample(FLAIR_array, origin_voxel_size, target_voxel)
+            BRAIN_array = resample(BRAIN_array, origin_voxel_size, target_voxel)
+            INFARCT_array = resample(INFARCT_array, origin_voxel_size, target_voxel)
 
             time = str(datetime.datetime.now()).split()[1].split('.')[0]
             print(">>> Finished : Voxel Size Resampling ({})".format(time))
