@@ -32,7 +32,7 @@ def export_csv(patient_num, y_pred_binary, y_pred, path="/data", index=None):
     final_df = pd.DataFrame(values)
     final_df.to_csv(path+'/output/output.csv', sep = ',', header = False, index = False)
     
-    return final_df
+    return y_pred
 
 def making_result(S_train, y_pred_lst, y_pred_binary_lst, Y, models=[1,3,4,5,7,10]):
 
