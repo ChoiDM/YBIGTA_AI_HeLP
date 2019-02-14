@@ -21,7 +21,7 @@ def stacking(models, data, exclude=[2,6,8,9], predict_binary=["None"]) :
     return np.array(result).T
 
 
-def stacking_xgb(S_train, y_train) :
+def stacking_xgb(S_train, y_train, cv=5) :
     stacking_xgb = XGBClassifier()
     stacking_xgb_params1 = {
         'max_depth' : [2,3],
@@ -35,7 +35,7 @@ def stacking_xgb(S_train, y_train) :
     }
     
     scorer = make_scorer(fbeta_score, beta=0.5)
-    stacking_xgb_grid_1 = GridSearchCV(stacking_xgb, param_grid=stacking_xgb_params1, scoring=scorer, cv=5, verbose=0, n_jobs=-1)
+    stacking_xgb_grid_1 = GridSearchCV(stacking_xgb, param_grid=stacking_xgb_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
     stacking_xgb_grid_1.fit(S_train, y_train)
 
     meta_model = stacking_xgb_grid_1.best_estimator_
@@ -45,14 +45,14 @@ def stacking_xgb(S_train, y_train) :
     return meta_model
     
     
-def stacking_logistic(S_train, y_train) :
+def stacking_logistic(S_train, y_train, cv=5) :
     stacking_lr = LogisticRegression()
     stacking_lr_params1 = {
         'C': [0.001, 0.01, 0.1, 1, 10],
         'max_iter' : [n for n in range(100, 1101, 200)],
     }
 
-    stacking_lr_grid_1 = GridSearchCV(stacking_lr, param_grid=stacking_lr_params1, scoring=scorer, cv=5, verbose=0, n_jobs=-1)
+    stacking_lr_grid_1 = GridSearchCV(stacking_lr, param_grid=stacking_lr_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
     stacking_lr_grid_1.fit(S_train, y_train)
 
     meta_model = stacking_lr_grid_1.best_estimator_
@@ -61,7 +61,7 @@ def stacking_logistic(S_train, y_train) :
     return meta_model
     
     
-def stacking_weight(S_train, y_train) :
+def stacking_weight(S_train, y_train, cv=5) :
     def stack_fn(num_models=len(S_train[0])):
         model = Sequential()
         model.add(Dense(2, input_dim=num_models, activation='softmax'))
@@ -70,10 +70,10 @@ def stacking_weight(S_train, y_train) :
         return model
     
     meta_model = KerasClassifier(build_fn=stack_fn)
-    meta_model.fit(S_train, y_train, epochs=30)
+    meta_model.fit(S_train, y_train, epochs=40)
     return meta_model
     
-def stacking_NN(S_train, y_train) :
+def stacking_NN(S_train, y_train, cv=5) :
     def stack_fn(num_models=len(S_train[0])):
         model = Sequential()
         model.add(Dense(16, input_dim=num_models, activation='relu'))
@@ -84,7 +84,7 @@ def stacking_NN(S_train, y_train) :
         return model
     
     meta_model = KerasClassifier(build_fn=stack_fn)
-    meta_model.fit(S_train, y_train, epochs=30)
+    meta_model.fit(S_train, y_train, epochs=40)
     return meta_model
 
 

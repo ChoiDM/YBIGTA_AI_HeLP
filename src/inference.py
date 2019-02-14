@@ -91,8 +91,9 @@ print("Threshold :", threshold)
 y_pred_lst = []
 y_pred_binary_lst =[]
 for meta in [meta_xgb, meta_logistic, meta_NN, meta_weight] :
-    y_pred_lst.append(meta.predict_proba(S_train)[:, 1])
-    y_pred_binary_lst.append(pred_to_binary(y_pred_xgb, threshold = threshold))
+    pred = meta.predict_proba(S_train)[:, 1]
+    y_pred_lst.append(pred)
+    y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold))
 
 # TODO : add one more model stacking
 

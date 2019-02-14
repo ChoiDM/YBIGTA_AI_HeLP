@@ -1,5 +1,5 @@
 from utils.data_loader import train_data_loader, test_data_loader
-from utils.inference_tools import making_result
+from utils.inference_tools import pred_to_binary, export_csv, making_result
 from utils.model_stacking import *
 
 from xgboost import XGBClassifier
@@ -26,8 +26,8 @@ print("Start:", time, "\n")
 
 # Print Information
 name = 'KHW'
-model = 'Stacking sklearn model'
-summary = 'HyperParams tuning with 9 sklearn models'
+model = 'ML Stacking'
+summary = 'HyperParams tuning with 10 sklearn models + 4 stacking model'
 
 print('Author Name :', name)
 print('Model :', model)
@@ -338,9 +338,11 @@ y_pred_lst = []
 y_pred_binary_lst =[]
 threshold = "auto"
 for meta in [meta_xgb, meta_logistic, meta_NN, meta_weight] :
-    y_pred_lst.append(meta.predict_proba(S_train)[:, 1])
-    y_pred_binary_lst.append(pred_to_binary(y_pred_xgb, threshold = threshold))
+    pred = meta.predict_proba(S_train)[:, 1]
+    y_pred_lst.append(pred)
+    y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold))
 
+print("\n")
 print(making_result(S_train, y_pred_lst, y_pred_binary_lst, y_train))
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -356,7 +358,7 @@ meta_NN.model.save_weights(path+'/model/meta_NN.h5')
 with open(path+'/model/meta_NN.json', 'w') as f :
     f.write(meta_NN.model.to_json())
     
-meta_weight.model.save_weightspath+'/model/meta_weight.h5')
+meta_weight.model.save_weights(path+'/model/meta_weight.h5')
 with open(path+'/model/meta_NN.json', 'w') as f :
     f.write(meta_weight.model.to_json())
 #------------------------------------------------------------------------------------------------------------------------
