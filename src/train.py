@@ -1,4 +1,5 @@
 from utils.data_loader import train_data_loader, test_data_loader
+from utils.inference_tools import making_df
 
 from xgboost import XGBClassifier
 from sklearn.svm import SVC
@@ -79,14 +80,14 @@ print("model1")
 model1 = XGBClassifier()
 
 m1_params1 = {
-    'max_depth' : [3,5,7,9],
-    'min_child_weight' : [0.5, 1, 5, 10],
-    'gamma' : [0, 0.5, 1, 1.5, 2, 5],
+    'max_depth' : [5,6,7,8],
+    'min_child_weight' : [0.5, 1, 5, 10, 15, 20],
+    'gamma' : [1.5, 2, 2.5, 3.0, 5],
     'subsample' : [0.5, 0.6, 0.8, 1.0],
     'colsample_bytree' : [0.5, 0.6, 0.8, 1.0],
     'probability' : [True],
     'learning_rate' : [0.01, 0.05, 0.1],
-    'n_estimators' : [100, 300, 500]
+    'n_estimators' : [300, 500, 700]
 }
 
 m1_grid_1 = GridSearchCV(model1, param_grid=m1_params1, scoring=scorer, cv=2, verbose=0, n_jobs=-1)
@@ -312,9 +313,9 @@ def stacking(models, data) :
     result = []
     
     for idx, model in enumerate(models) :
-        if idx+1 in [2,9] :
+        if idx+1 in [2,9, 6, 7] :
             continue
-        if idx+1 in [6,8] :
+        if idx+1 in [8] :
             result.append(model.predict(data))
         else :
             result.append(model.predict_proba(data)[:,1])
@@ -333,7 +334,7 @@ from keras.layers import Dense
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.utils import np_utils
 
-def stack_fn(num_models=8):
+def stack_fn(num_models=6):
     model = Sequential()
     model.add(Dense(16, input_dim=num_models, activation='relu'))
     model.add(Dense(16, input_dim=16, activation='relu'))
@@ -344,9 +345,11 @@ def stack_fn(num_models=8):
 
 meta_model = KerasClassifier(build_fn=stack_fn)
 meta_model.fit(S_train, y_train, epochs=30)
+print(predict_train(S_train, meta_model.predict_proba(S_train), y_train))
 
 
 # Save stacking model
+print("\n---------- Save Staking Model ----------")
 meta_model.model.save_weights('/data/model/model_weights.h5')
 
 with open('/data/model/model_architecture.json', 'w') as f :

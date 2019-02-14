@@ -59,9 +59,9 @@ def stacking(models, data) :
     result = []
     
     for idx, model in enumerate(models) :
-        if idx+1 in [2,9] :
+        if idx+1 in [2,9, 6, 7] :
             continue
-        if idx+1 in [6,8] :
+        if idx+1 in [8] :
             result.append(model.predict(data))
         else :
             result.append(model.predict_proba(data)[:,1])
@@ -94,10 +94,8 @@ print("Threshold :", threshold)
 
 y_pred = meta.predict_proba(S_test)[:, 1]
 y_pred_binary = pred_to_binary(y_pred, threshold = threshold)
-print(y_pred)
-print(y_pred_binary)
-
 
 # Make 'output.csv'
-export_csv(patient_num, y_pred_binary, y_pred)
+final_df = export_csv(patient_num, y_pred_binary, y_pred)
+print(final_df)
 

@@ -18,3 +18,12 @@ def export_csv(patient_num, y_pred_binary, y_pred, path="/data/output/"):
 
     final_df = pd.DataFrame(values)
     final_df.to_csv(path+'output.csv', sep = ',', header = False, index = False)
+    
+    return final_df
+
+def making_df(S_train, meta, y_true):
+
+    values = [list(s)+[m]+[y] for s,m,y in zip(S_train, meta, y_true)]
+
+    final_df = pd.DataFrame(values)
+    return final_df
