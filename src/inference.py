@@ -11,6 +11,8 @@ warnings.filterwarnings('ignore')
 # Setting
 test_dir = '/data/test/'
 
+features = ['firstorder', 'shape']
+
 do_n4 = False
 do_ws = True
 do_resample = True
@@ -21,7 +23,7 @@ return_patient_num = True
 
 
 # Data Load
-X_test, patient_num = test_data_loader(test_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num)
+X_test, patient_num = test_data_loader(test_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num, features)
 
 
 #########################################################################################################################
