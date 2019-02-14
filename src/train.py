@@ -29,6 +29,7 @@ pos_dir = "/data/train/positive/"
 neg_dir = "/data/train/negative/"
 
 features = ['firstorder', 'shape']
+target_voxel = (0.65, 0.65, 3)
 
 do_n4 = False
 do_ws = True
@@ -45,7 +46,8 @@ return_patient_num = False
 
 
 # Data Load
-X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num, features)
+X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num,
+                                     features, target_voxel)
 
 
 # Fit Model with Training Data
