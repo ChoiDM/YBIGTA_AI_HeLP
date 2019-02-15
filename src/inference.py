@@ -42,5 +42,6 @@ y_pred_binary = pred_to_binary(y_pred, threshold = 0.5)
 
 # Make 'output.csv'
 df = make_df(patient_num, y_pred_binary, y_pred)
+df.columns = ["Number", "Binary", "Proba"]
 print(df)
 export_csv(df)
