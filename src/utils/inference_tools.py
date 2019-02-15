@@ -10,11 +10,13 @@ def pred_to_binary(pred_array, threshold = 0.5):
 
     return pred_binary
 
-
-def export_csv(patient_num, y_pred_binary, y_pred, path="/data/output/"):
-
+def make_df(patient_num, y_pred_binary, y_pred):
     values = [[num, binary, prob] for num, binary, prob in
                 zip(patient_num, y_pred_binary, y_pred)]
 
     final_df = pd.DataFrame(values)
-    final_df.to_csv(path+'output.csv', sep = ',', header = False, index = False)
+    return final_df
+
+
+def export_csv(df, path="/data/output/"):
+    df.to_csv(path+'output.csv', sep = ',', header = False, index = False)

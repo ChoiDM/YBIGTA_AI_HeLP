@@ -1,5 +1,6 @@
 from utils.data_loader import test_data_loader
-from utils.inference_tools import pred_to_binary, export_csv
+from utils.inference_tools import pred_to_binary, export_csv, make_df
+from utils import utils
 import pandas as pd
 import xgboost as xgb
 import pickle
@@ -7,6 +8,7 @@ import pickle
 import warnings
 warnings.filterwarnings('ignore')
 
+print("File: inference.py | Start:", utils.now())
 
 # Setting
 test_dir = '/data/test/'
@@ -39,4 +41,6 @@ y_pred_binary = pred_to_binary(y_pred, threshold = 0.5)
 
 
 # Make 'output.csv'
-export_csv(patient_num, y_pred_binary, y_pred)
+df = make_df(patient_num, y_pred_binary, y_pred)
+print(df)
+export_csv(df)
