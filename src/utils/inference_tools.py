@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-pd.set_option('display.height', 500)
 pd.set_option('display.max_rows', 500)
+pd.set_option('display.max_columns', 500)
 
 
 def pred_to_binary(pred_array, threshold = 0.5):
