@@ -16,6 +16,8 @@ import datetime
 
 import warnings
 warnings.filterwarnings('ignore')
+pd.set_option('display.height', 500)
+pd.set_option('display.max_rows', 500)
 
 
 # Print Current Time
@@ -27,7 +29,7 @@ print("Start:", time, "\n")
 # Print Information
 name = 'KHW'
 model = 'ML Stacking'
-summary = 'HyperParams tuning with 10 sklearn models + 4 stacking model'
+summary = 'HyperParams tuning with 6 sklearn models + 4 stacking model  + 1 stacking model(weight)'
 
 print('Author Name :', name)
 print('Model :', model)
@@ -38,6 +40,9 @@ print('Summary :', summary)
 path = "/data"
 pos_dir = path+"/train/positive/"
 neg_dir = path+"/train/negative/"
+
+features = ['firstorder', 'shape']
+target_voxel = (0.65, 0.65, 3)
 
 do_n4 = False
 do_ws = True
@@ -50,7 +55,7 @@ return_patient_num = False
 
 # Data Load
 print("\n---------- Data Load ----------")
-X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num)
+X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num, features, target_voxel)
 
 
 #########################################################################################################################
@@ -60,6 +65,7 @@ X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample
 #------------------------------------------------------------------------------------------------------------------------
 # Fit ML model with training data
 print("\n---------- Start ML Train ----------")
+cv=5
 
 #########
 ## scorer
@@ -90,9 +96,11 @@ m1_params1 = {
     'probability' : [True],
     'learning_rate' : [0.01, 0.05, 0.1],
     'n_estimators' : [300, 500, 700]
+    
+    
 }
 
-m1_grid_1 = GridSearchCV(model1, param_grid=m1_params1, scoring=scorer, cv=5, verbose=0, n_jobs=-1)
+m1_grid_1 = GridSearchCV(model1, param_grid=m1_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m1_grid_1.fit(X_train, y_train)
 
 best_model1 = m1_grid_1.best_estimator_
@@ -112,7 +120,7 @@ m2_params1 = {
     'probability' : [True]
 }
 
-m2_grid_1 = GridSearchCV(model2, param_grid=m2_params1, scoring=scorer, cv=5, verbose=0, n_jobs=-1)
+m2_grid_1 = GridSearchCV(model2, param_grid=m2_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m2_grid_1.fit(X_train, y_train)
 
 best_model2 = m2_grid_1.best_estimator_
@@ -130,7 +138,7 @@ m3_params1 = {
     'max_iter' : [n for n in range(100,1101, 200)],
 }
 
-m3_grid_1 = GridSearchCV(model3, param_grid=m3_params1, scoring=scorer, cv=5, verbose=0, n_jobs=-1)
+m3_grid_1 = GridSearchCV(model3, param_grid=m3_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m3_grid_1.fit(X_train, y_train)
 
 best_model3 = m3_grid_1.best_estimator_
@@ -149,7 +157,7 @@ m4_params1 = {
     'n_estimators' : [100, 300, 500]
 }
 
-m4_grid_1 = GridSearchCV(model4, param_grid=m4_params1, scoring=scorer, cv=5, verbose=0, n_jobs=-1)
+m4_grid_1 = GridSearchCV(model4, param_grid=m4_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m4_grid_1.fit(X_train, y_train)
 
 best_model4 = m4_grid_1.best_estimator_
@@ -168,7 +176,7 @@ m5_params1 = {
     'penalty' : ["l1"]
 }
 
-m5_grid_1 = GridSearchCV(model5, param_grid=m5_params1, scoring=scorer, cv=5, verbose=0, n_jobs=-1)
+m5_grid_1 = GridSearchCV(model5, param_grid=m5_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m5_grid_1.fit(X_train, y_train)
 
 best_model5 = m5_grid_1.best_estimator_
@@ -186,7 +194,7 @@ m6_params1 = {
     'max_iter' : [None]+[n for n in range(100,1101, 200)]
 }
 
-m6_grid_1 = GridSearchCV(model6, param_grid=m6_params1, scoring=scorer, cv=5, verbose=0, n_jobs=-1)
+m6_grid_1 = GridSearchCV(model6, param_grid=m6_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m6_grid_1.fit(X_train, y_train)
 
 best_model6 = m6_grid_1.best_estimator_
@@ -207,7 +215,7 @@ m7_params1 = {
     'loss' : ["log"]
 }
 
-m7_grid_1 = GridSearchCV(model7, param_grid=m7_params1, scoring=scorer, cv=5, verbose=0, n_jobs=-1)
+m7_grid_1 = GridSearchCV(model7, param_grid=m7_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m7_grid_1.fit(X_train, y_train)
 
 best_model7 = m7_grid_1.best_estimator_
@@ -231,7 +239,7 @@ m8_best_grid_1 = ""
 
 for t in [0, 0.05, 0.1, 0.2, 0.25, 0.3, 0.45, 0.4, 0.45, 0.5, 0.6] :
     scorer2 = make_scorer(new_scorer, threshold=t)
-    m8_grid_1 = GridSearchCV(model8, param_grid=m8_params1, scoring=scorer2, cv=5, verbose=0, n_jobs=-1)
+    m8_grid_1 = GridSearchCV(model8, param_grid=m8_params1, scoring=scorer2, cv=cv, verbose=0, n_jobs=-1)
     m8_grid_1.fit(X_train, y_train)
 
     if max_score < m8_grid_1.best_score_ :
@@ -262,7 +270,7 @@ best_model9 = ""
 m9_best_grid_1 = ""
 for t in [0, 0.05, 0.1, 0.2, 0.25, 0.3, 0.45, 0.4, 0.45, 0.5, 0.6] :
     scorer2 = make_scorer(new_scorer, threshold=t)
-    m9_grid_1 = GridSearchCV(model9, param_grid=m9_params1, scoring=scorer2, cv=5, verbose=0, n_jobs=-1)
+    m9_grid_1 = GridSearchCV(model9, param_grid=m9_params1, scoring=scorer2, cv=cv, verbose=0, n_jobs=-1)
     m9_grid_1.fit(X_train, y_train)
 
     if max_score < m9_grid_1.best_score_ :
@@ -287,7 +295,7 @@ m10_params1 = {
     'n_estimators' : [10, 50, 100, 300, 500]
 }
 
-m10_grid_1 = GridSearchCV(model10, param_grid=m10_params1, scoring=scorer, cv=5, verbose=0, n_jobs=-1)
+m10_grid_1 = GridSearchCV(model10, param_grid=m10_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m10_grid_1.fit(X_train, y_train)
 
 best_model10 = m10_grid_1.best_estimator_
@@ -314,14 +322,6 @@ pickle.dump(best_model10, open(path+'/model/model10.pickle.dat', 'wb'))
 
 
 #------------------------------------------------------------------------------------------------------------------------
-# Model Stacking
-print("\n---------- Model Stacking ----------")
-
-###########
-## stacking
-models = [best_model1, best_model2, best_model3, best_model4, best_model5, best_model6, best_model7, best_model8, best_model9, best_model10]
-S_train = stacking(models, X_train)
-
 # Fit stacking model
 print("\n---------- Start Staking Train ----------")
 from keras.models import Sequential
@@ -329,10 +329,15 @@ from keras.layers import Dense
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.utils import np_utils
 
-meta_xgb = stacking_xgb(S_train, y_train, cv=5)
-meta_logistic = stacking_logistic(S_train, y_train, cv=5)
-meta_NN = stacking_NN(S_train, y_train, cv=5)
-meta_weight = stacking_weight(S_train, y_train, cv=5)
+# Layer1
+print("\n---------- Layer1 ----------")
+models = [best_model1, best_model2, best_model3, best_model4, best_model5, best_model6, best_model7, best_model8, best_model9, best_model10]
+S_train = stacking(models, X_train)
+
+meta_xgb = stacking_xgb(S_train, y_train, cv=2)
+meta_logistic = stacking_logistic(S_train, y_train, cv=2)
+meta_NN = stacking_NN(S_train, y_train, cv=2)
+meta_weight = stacking_weight(S_train, y_train, cv=2)
 
 y_pred_lst = []
 y_pred_binary_lst =[]
@@ -341,9 +346,32 @@ for meta in [meta_xgb, meta_logistic, meta_NN, meta_weight] :
     pred = meta.predict_proba(S_train)[:, 1]
     y_pred_lst.append(pred)
     y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold))
+    
+# Layer2
+print("\n---------- Layer2 ----------")
+models2 = [meta_xgb, meta_logistic, meta_NN, meta_weight]
+S_train2 = stacking(models2, S_train, layer=2)
 
+meta_xgb2 = stacking_xgb(S_train2, y_train, cv=2)
+meta_logistic2 = stacking_logistic(S_train2, y_train, cv=2)
+meta_NN2 = stacking_NN(S_train2, y_train, cv=2)
+meta_weight2 = stacking_weight(S_train2, y_train, cv=2)
+
+y_pred_lst2 = []
+y_pred_binary_lst2 =[]
+threshold = "auto"
+for meta in [meta_xgb2, meta_logistic2, meta_NN2, meta_weight2] :
+    pred = meta.predict_proba(S_train2)[:, 1]
+    y_pred_lst2.append(pred)
+    y_pred_binary_lst2.append(pred_to_binary(pred, threshold = threshold))
+    
+# Print result
 print("\n")
-print(making_result(S_train, y_pred_lst, y_pred_binary_lst, y_train))
+print(making_result(S_train, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, y_train))
+
+# Select model
+print("\n---------- Select Meta Model For Layer2 ----------")
+meta_model2 = meta_weight2
 #------------------------------------------------------------------------------------------------------------------------
 
 
@@ -361,8 +389,24 @@ with open(path+'/model/meta_NN.json', 'w') as f :
 meta_weight.model.save_weights(path+'/model/meta_weight.h5')
 with open(path+'/model/meta_weight.json', 'w') as f :
     f.write(meta_weight.model.to_json())
-#------------------------------------------------------------------------------------------------------------------------
 
+print("\n---------- Save Staking Model2 ----------")
+pickle.dump(meta_xgb2, open(path+'/model/meta_xgb2.pickle.dat', 'wb'))
+pickle.dump(meta_logistic2, open(path+'/model/meta_logistic2.pickle.dat', 'wb'))
+
+meta_NN2.model.save_weights(path+'/model/meta_NN2.h5')
+with open(path+'/model/meta_NN2.json', 'w') as f :
+    f.write(meta_NN2.model.to_json())
+    
+meta_weight2.model.save_weights(path+'/model/meta_weight2.h5')
+with open(path+'/model/meta_weight2.json', 'w') as f :
+    f.write(meta_weight2.model.to_json())
+    
+meta_model2.model.save_weights(path+'/model/meta_model2.h5')
+with open(path+'/model/meta_model2.json', 'w') as f :
+    f.write(meta_model2.model.to_json())
+#------------------------------------------------------------------------------------------------------------------------
+print("\n---------- train.py finished ----------")
 
 
 
