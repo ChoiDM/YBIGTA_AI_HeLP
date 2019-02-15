@@ -63,7 +63,7 @@ def f0_5(model, X_test, y_test):
     return fbeta_score(y_test, y_pred, 0.5)
 
 base = xgb.XGBClassifier(learning_rate=0.01, n_estimators=600, objective='binary:logistic', silent=True, nthread=1)
-model = RandomizedSearchCV(base, params, cv=5, scoring=make_scorer(fbeta_score(beta = 0.5)),
+model = RandomizedSearchCV(base, params, cv=5, scoring=make_scorer(fbeta_score, beta=0.5),
                            verbose=3, n_jobs=-1)
 model.fit(X_train, y_train)
 
