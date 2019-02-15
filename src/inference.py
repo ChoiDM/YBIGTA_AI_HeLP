@@ -48,7 +48,7 @@ model2 = pickle.load(open(path+'/model/model2.pickle.dat', 'rb'))
 model3 = pickle.load(open(path+'/model/model3.pickle.dat', 'rb'))
 model4 = pickle.load(open(path+'/model/model4.pickle.dat', 'rb'))
 model5 = pickle.load(open(path+'/model/model5.pickle.dat', 'rb'))
-model6 = pickle.load(open(path+'a/model/model6.pickle.dat', 'rb'))
+model6 = pickle.load(open(path+'/model/model6.pickle.dat', 'rb'))
 model7 = pickle.load(open(path+'/model/model7.pickle.dat', 'rb'))
 model8 = pickle.load(open(path+'/model/model8.pickle.dat', 'rb'))
 model9 = pickle.load(open(path+'/model/model9.pickle.dat', 'rb'))
@@ -95,7 +95,8 @@ for meta in [meta_xgb, meta_logistic, meta_NN, meta_weight] :
     y_pred_lst.append(pred)
     y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold))
 
-# TODO : add one more model stacking
+# TODO
+# add one more model stacking
 
 # Make 'output.csv'
 final = export_csv(patient_num, y_pred_binary, y_pred, path = path, index=0)

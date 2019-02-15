@@ -6,9 +6,8 @@ from sklearn.metrics import fbeta_score, make_scorer
 import pandas as pd
 import numpy as np
 
-def stacking(models, data, exclude=[2,6,7,8,9], predict_binary=["None"]) : 
+def stacking(models, data, exclude=[2,6,8,9], predict_binary=["None"]) : 
     result = []
-    
     for idx, model in enumerate(models) :
         if idx+1 in exclude :
             continue

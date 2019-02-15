@@ -19,6 +19,7 @@ def pred_to_binary(pred_array, threshold = 0.5):
 
     return pred_binary
 
+
 def export_csv(patient_num, y_pred_binary, y_pred, path="/data", index=None):
     
     if index != None :

@@ -329,10 +329,10 @@ from keras.layers import Dense
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.utils import np_utils
 
-meta_xgb = stacking_xgb(S_train, y_train)
-meta_logistic = stacking_xgb(S_train, y_train)
-meta_NN = stacking_xgb(S_train, y_train)
-meta_weight = stacking_xgb(S_train, y_train)
+meta_xgb = stacking_xgb(S_train, y_train, cv=5)
+meta_logistic = stacking_logistic(S_train, y_train, cv=5)
+meta_NN = stacking_NN(S_train, y_train, cv=5)
+meta_weight = stacking_weight(S_train, y_train, cv=5)
 
 y_pred_lst = []
 y_pred_binary_lst =[]
@@ -359,7 +359,7 @@ with open(path+'/model/meta_NN.json', 'w') as f :
     f.write(meta_NN.model.to_json())
     
 meta_weight.model.save_weights(path+'/model/meta_weight.h5')
-with open(path+'/model/meta_NN.json', 'w') as f :
+with open(path+'/model/meta_weight.json', 'w') as f :
     f.write(meta_weight.model.to_json())
 #------------------------------------------------------------------------------------------------------------------------
 
