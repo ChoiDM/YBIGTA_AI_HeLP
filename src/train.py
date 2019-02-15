@@ -1,5 +1,5 @@
 from utils.data_loader import train_data_loader
-from sklearn.metrics import fbeta_score, make_score
+from sklearn.metrics import fbeta_score, make_scorer
 import xgboost as xgb
 import pickle
 import datetime
@@ -56,7 +56,7 @@ xgbClassifier.fit(X_train, y_train)
 
 
 # Use F0.5 score if necessary
-# f_score = make_score(fbeta_score, beta = 0.5)
+# f_score = make_scorer(fbeta_score, beta = 0.5)
 
 
 # Save model to file
