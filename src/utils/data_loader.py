@@ -258,10 +258,6 @@ def test_data_loader(test_dir='/data/test/', do_n4=True, do_ws=True, do_resample
             error_patient.append(test_patient)
 
     X = np.array(X)
-
-    if return_patient_num:
-        return X, patient_num, error_patient
-
-    else:
-        return X
+    
+    return X, patient_num, error_patient
 
