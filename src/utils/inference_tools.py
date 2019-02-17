@@ -13,15 +13,15 @@ def pred_to_binary(pred_array, threshold = 0.5):
 
 def export_csv(patient_num, error_patient, class_of_error_patient, y_pred_binary, y_pred, path="/data/output/"):
 
-    values = [[int(num), binary, prob] for num, binary, prob in
+    values = [[num, binary, prob] for num, binary, prob in
                 zip(patient_num, y_pred_binary, y_pred)]
 
     for patient in error_patient:
         if class_of_error_patient == 0:
-            values.append([int(patient), class_of_error_patient, 0.0])
+            values.append([patient, class_of_error_patient, 0.0])
 
         elif class_of_error_patient == 1:
-            values.append([int(patient), class_of_error_patient, 1.0])
+            values.append([patient, class_of_error_patient, 1.0])
 
         else:
             print("parameter 'class_of_error_patient' should be 0 or 1.")
