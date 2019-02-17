@@ -13,9 +13,9 @@ print("Start:", time)
 
 
 # Print Information
-name = 'main-branch'
+name = 'master-branch'
 model = 'XGBoost'
-summary = 'No hyper-parameter tuning. Basic Model'
+summary = 'Parameter from Grid-Search (subsample=1.0, gamma=2, colsample_bytree=0.8, max_depth=6, min_child_weight=10)'
 
 print('---------------------------')
 print('Author Name :', name)
@@ -36,8 +36,6 @@ do_ws = True
 do_resample = True
 
 do_shuffle = True
-save_to_disk = False
-return_patient_num = False
 
 
 #########################################################################################################################
@@ -46,12 +44,11 @@ return_patient_num = False
 
 
 # Data Load
-X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num,
-                                     features, target_voxel)
+X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample, do_shuffle, features, target_voxel)
 
 
 # Fit Model with Training Data
-xgbClassifier = xgb.XGBClassifier()
+xgbClassifier = xgb.XGBClassifier(subsample=1.0, gamma=2, colsample_bytree=0.8, max_depth=6, min_child_weight=10)
 xgbClassifier.fit(X_train, y_train)
 
 

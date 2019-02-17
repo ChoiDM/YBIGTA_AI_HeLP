@@ -14,8 +14,8 @@ from utils.FeatureExtract import feature_extract
 
 # Feature Extraction for Train
 def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/negative/', do_n4=True, do_ws=True,
-                      do_resample=True,do_shuffle=True, save_to_disk=False, return_patient_num=False,
-                      features = ['firstorder', 'glcm', 'glszm', 'glrlm', 'ngtdm', 'shape'], target_voxel = (0.65, 0.65, 3)):
+                      do_resample=True, do_shuffle=True,
+                      features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3)):
     # File List
     pos_file_list = glob(pos_dir + "*")
     neg_file_list = glob(neg_dir + "*")
@@ -83,31 +83,7 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
             FLAIR_values, FLAIR_columns = feature_extract(FLAIR_array, INFARCT_array, features)
 
             total_values = ADC_values + FLAIR_values
-            total_columns = ['ADC_' + col for col in ADC_columns] + ['FLAIR_' + col for col in ADC_columns]
-
-            # Save
-            if save_to_disk:
-
-                if not os.path.exists("output"):
-                    os.mkdir("output")
-
-                ADC_to_save = nib.Nifti1Image(ADC_array, np.eye(4))
-                FLAIR_to_save = nib.Nifti1Image(FLAIR_array, np.eye(4))
-                BRAIN_to_save = nib.Nifti1Image(BRAIN_array, np.eye(4))
-                INFARCT_to_save = nib.Nifti1Image(INFARCT_array, np.eye(4))
-
-                nib.save(ADC_to_save, os.path.join("output", pos_patient + "_ADC_resampled.nii"))
-                nib.save(FLAIR_to_save, os.path.join("output", pos_patient + "_FLAIR_resampled.nii"))
-                nib.save(BRAIN_to_save, os.path.join("output", pos_patient + "_BRAIN_resampled.nii"))
-                nib.save(INFARCT_to_save, os.path.join("output", pos_patient + "_INFARCT_resampled.nii"))
-
-                if not os.path.isfile("output/total_columns.txt"):
-
-                    with open("output/total_columns.txt", "w") as output_file:
-                        for col in total_columns:
-                            output_file.write(col + ' ')
-
-                print(">>> Finished : Saved to Disk")
+            # total_columns = ['ADC_' + col for col in ADC_columns] + ['FLAIR_' + col for col in ADC_columns]
 
             X.append(total_values)
             y.append(1)
@@ -174,31 +150,7 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
             FLAIR_values, FLAIR_columns = feature_extract(FLAIR_array, INFARCT_array, features)
 
             total_values = ADC_values + FLAIR_values
-            total_columns = ['ADC_' + col for col in ADC_columns] + ['FLAIR_' + col for col in ADC_columns]
-
-            # Save
-            if save_to_disk:
-
-                if not os.path.exists("output"):
-                    os.mkdir("output")
-
-                ADC_to_save = nib.Nifti1Image(ADC_array, np.eye(4))
-                FLAIR_to_save = nib.Nifti1Image(FLAIR_array, np.eye(4))
-                BRAIN_to_save = nib.Nifti1Image(BRAIN_array, np.eye(4))
-                INFARCT_to_save = nib.Nifti1Image(INFARCT_array, np.eye(4))
-
-                nib.save(ADC_to_save, os.path.join("output", neg_patient + "_ADC_resampled.nii"))
-                nib.save(FLAIR_to_save, os.path.join("output", neg_patient + "_FLAIR_resampled.nii"))
-                nib.save(BRAIN_to_save, os.path.join("output", neg_patient + "_BRAIN_resampled.nii"))
-                nib.save(INFARCT_to_save, os.path.join("output", neg_patient + "_INFARCT_resampled.nii"))
-
-                if not os.path.isfile("output/total_columns.txt"):
-
-                    with open("output/total_columns.txt", "w") as output_file:
-                        for col in total_columns:
-                            output_file.write(col + ' ')
-
-                print(">>> Finished : Saved to Disk")
+            # total_columns = ['ADC_' + col for col in ADC_columns] + ['FLAIR_' + col for col in ADC_columns]
 
             X.append(total_values)
             y.append(0)
@@ -223,17 +175,12 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
     time = str(datetime.datetime.now()).split()[1].split('.')[0]
     print("Created X of shape {} and y of shape {} ({})".format(X.shape, y.shape, time))
 
-    if return_patient_num:
-        return X, y, patient_num
+    return X, y
 
-    else:
-        return X, y
 
 
 # Feature Extraction for Inference
-def test_data_loader(test_dir='/data/test/', do_n4=True, do_ws=True, do_resample=True,
-                     do_shuffle=False, save_to_disk=False, return_patient_num=False,
-                     features = ['firstorder', 'glcm', 'glszm', 'glrlm', 'ngtdm', 'shape'], target_voxel = (0.65, 0.65, 3)):
+def test_data_loader(test_dir='/data/test/', do_n4=True, do_ws=True, do_resample=True, features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3)):
     # File List
     test_file_list = glob(test_dir + "*")
     test_patient_list = list(set([path.split('_')[0] for path in os.listdir(test_dir)]))
@@ -241,101 +188,79 @@ def test_data_loader(test_dir='/data/test/', do_n4=True, do_ws=True, do_resample
     # Data Container
     X = []
     patient_num = []
+    error_patient = []
 
     for i, test_patient in enumerate(test_patient_list):
-        time = str(datetime.datetime.now()).split()[1].split('.')[0]
-        print("Processing [{0}/{1}] Image of Test Patient... ({2})".format(i + 1, len(test_patient_list), time))
 
-        ADC_path, FLAIR_path, b1000_path, BRAIN_path, INFARCT_path = sorted(
-            [path for path in test_file_list if test_patient in path])
-
-        # Data Preparing
-        ADC_array = nib.load(ADC_path).get_data()
-        FLAIR_array = nib.load(FLAIR_path).get_data()
-        BRAIN_array = nib.load(BRAIN_path).get_data()
-
-        INFARCT_nii = nib.load(INFARCT_path)
-        INFARCT_array = INFARCT_nii.get_data()
-
-        origin_voxel_size = INFARCT_nii.header.get_zooms()
-
-        # Pre-processing (1)- Resampling Voxel Size
-        if do_resample:
-            ADC_array = resample(ADC_array, origin_voxel_size, target_voxel)
-            FLAIR_array = resample(FLAIR_array, origin_voxel_size, target_voxel)
-            BRAIN_array = resample(BRAIN_array, origin_voxel_size, target_voxel)
-            INFARCT_array = resample(INFARCT_array, origin_voxel_size, target_voxel)
-
+        try:
             time = str(datetime.datetime.now()).split()[1].split('.')[0]
-            print(">>> Finished : Voxel Size Resampling ({})".format(time))
+            print("Processing [{0}/{1}] Image of Test Patient... ({2})".format(i + 1, len(test_patient_list), time))
 
-        # Make Mask to Binary (0 or 1)
-        BRAIN_array = mask2binary(BRAIN_array)
-        INFARCT_array = mask2binary(INFARCT_array)
-        print(">>> Unique Value of BRAIN mask :", np.unique(BRAIN_array))
-        print(">>>Unique Value of INFARCT mask :", np.unique(INFARCT_array))
+            ADC_path, FLAIR_path, b1000_path, BRAIN_path, INFARCT_path = sorted(
+                [path for path in test_file_list if test_patient in path])
 
-        # Pre-processing (2)- N4 Bias Correction
-        if do_n4:
-            ADC_array = n4correction(ADC_array)
-            FLAIR_array = n4correction(FLAIR_array)
+            # Data Preparing
+            ADC_array = nib.load(ADC_path).get_data()
+            FLAIR_array = nib.load(FLAIR_path).get_data()
+            BRAIN_array = nib.load(BRAIN_path).get_data()
 
-            time = str(datetime.datetime.now()).split()[1].split('.')[0]
-            print(">>> Finished : N4 Bias Correction ({})".format(time))
+            INFARCT_nii = nib.load(INFARCT_path)
+            INFARCT_array = INFARCT_nii.get_data()
 
-        # Pre-processing (3)- White-stripe Normalization
-        if do_ws:
-            # ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
-            FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
+            origin_voxel_size = INFARCT_nii.header.get_zooms()
 
-            time = str(datetime.datetime.now()).split()[1].split('.')[0]
-            print(">>> Finished : White-stripe Normalization ({})".format(time))
+            # Pre-processing (1)- Resampling Voxel Size
+            if do_resample:
+                ADC_array = resample(ADC_array, origin_voxel_size, target_voxel)
+                FLAIR_array = resample(FLAIR_array, origin_voxel_size, target_voxel)
+                BRAIN_array = resample(BRAIN_array, origin_voxel_size, target_voxel)
+                INFARCT_array = resample(INFARCT_array, origin_voxel_size, target_voxel)
 
-        # Feature Extraction by Radiomics
-        ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array, features)
-        FLAIR_values, FLAIR_columns = feature_extract(FLAIR_array, INFARCT_array, features)
+                time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                print(">>> Finished : Voxel Size Resampling ({})".format(time))
 
-        total_values = ADC_values + FLAIR_values
-        total_columns = ['ADC_' + col for col in ADC_columns] + ['FLAIR_' + col for col in ADC_columns]
+            # Make Mask to Binary (0 or 1)
+            BRAIN_array = mask2binary(BRAIN_array)
+            INFARCT_array = mask2binary(INFARCT_array)
+            print(">>> Unique Value of BRAIN mask :", np.unique(BRAIN_array))
+            print(">>>Unique Value of INFARCT mask :", np.unique(INFARCT_array))
 
-        # Save
-        if save_to_disk:
+            # Pre-processing (2)- N4 Bias Correction
+            if do_n4:
+                ADC_array = n4correction(ADC_array)
+                FLAIR_array = n4correction(FLAIR_array)
 
-            if not os.path.exists("output"):
-                os.mkdir("output")
+                time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                print(">>> Finished : N4 Bias Correction ({})".format(time))
 
-            ADC_to_save = nib.Nifti1Image(ADC_array, np.eye(4))
-            FLAIR_to_save = nib.Nifti1Image(FLAIR_array, np.eye(4))
-            BRAIN_to_save = nib.Nifti1Image(BRAIN_array, np.eye(4))
-            INFARCT_to_save = nib.Nifti1Image(INFARCT_array, np.eye(4))
+            # Pre-processing (3)- White-stripe Normalization
+            if do_ws:
+                # ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
+                FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
 
-            nib.save(ADC_to_save, os.path.join("output", test_patient + "_ADC_resampled.nii"))
-            nib.save(FLAIR_to_save, os.path.join("output", test_patient + "_FLAIR_resampled.nii"))
-            nib.save(BRAIN_to_save, os.path.join("output", test_patient + "_BRAIN_resampled.nii"))
-            nib.save(INFARCT_to_save, os.path.join("output", test_patient + "_INFARCT_resampled.nii"))
+                time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                print(">>> Finished : White-stripe Normalization ({})".format(time))
 
-            if not os.path.isfile("output/total_columns.txt"):
+            # Feature Extraction by Radiomics
+            ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array, features)
+            FLAIR_values, FLAIR_columns = feature_extract(FLAIR_array, INFARCT_array, features)
 
-                with open("output/total_columns.txt", "w") as output_file:
-                    for col in total_columns:
-                        output_file.write(col + ' ')
+            total_values = ADC_values + FLAIR_values
+            # total_columns = ['ADC_' + col for col in ADC_columns] + ['FLAIR_' + col for col in ADC_columns]
 
-            print(">>> Finished : Saved to Disk")
+            X.append(total_values)
+            patient_num.append(test_patient)
 
-        X.append(total_values)
-        patient_num.append(test_patient)
+        except Exception as e:
+            print("!! Error in", test_patient)
+            print(e)
 
-    if do_shuffle:
-        shuffle_list = [[X_value, num] for X_value, num in zip(X, patient_num)]
-        shuffle(shuffle_list)
-
-        X = [value[0] for value in shuffle_list]
-        patient_num = [value[1] for value in shuffle_list]
+            error_patient.append(test_patient)
 
     X = np.array(X)
 
     if return_patient_num:
-        return X, patient_num
+        return X, patient_num, error_patient
 
     else:
         return X

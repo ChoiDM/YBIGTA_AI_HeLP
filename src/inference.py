@@ -18,14 +18,12 @@ do_n4 = False
 do_ws = True
 do_resample = True
 
-do_shuffle = False
-save_to_disk = False
-return_patient_num = True
+threshold = 0.629
+class_of_error_patient = 0
 
 
 # Data Load
-X_test, patient_num = test_data_loader(test_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num,
-                                       features, target_voxel)
+X_test, patient_num, error_patient = test_data_loader(test_dir, do_n4, do_ws, do_resample, features, target_voxel)
 
 
 #########################################################################################################################
@@ -39,8 +37,8 @@ xgbClassifier = pickle.load(open('/data/model/xgb.pickle.dat', 'rb'))
 
 # Make Predictions for Test Data
 y_pred = xgbClassifier.predict_proba(X_test)[:, 1]
-y_pred_binary = pred_to_binary(y_pred, threshold = 0.5)
+y_pred_binary = pred_to_binary(y_pred, threshold = threshold)
 
 
 # Make 'output.csv'
-export_csv(patient_num, y_pred_binary, y_pred)
+export_csv(patient_num, error_patient, class_of_error_patient, y_pred_binary, y_pred)
