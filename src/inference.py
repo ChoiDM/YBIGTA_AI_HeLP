@@ -17,7 +17,7 @@ target_voxel = (0.65, 0.65, 3)
 norm = 'new' # 'norm' should be 'ws' or 'new'
 do_resample = True
 
-threshold = 0.629
+threshold = 0.70
 class_of_error_patient = 0
 
 
