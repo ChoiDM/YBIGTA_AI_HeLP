@@ -22,14 +22,20 @@ def pred_to_binary(pred_array, threshold = 0.5):
     return pred_binary
 
 
-def export_csv(patient_num, y_pred_binary, y_pred, path="/data", index=None):
+def export_csv(patient_num, error_patient, y_pred_binary, y_pred, path="/data", index=None, class_of_error_patient=0):
     
     if index != None :
         y_pred_binary = y_pred_binary[index]
         y_pred = y_pred[index]
 
-    values = [[num, binary, prob] for num, binary, prob in
-                zip(patient_num, y_pred_binary, y_pred)]
+    values = [[num, binary, prob] for num, binary, prob in zip(patient_num, y_pred_binary, y_pred)]
+    
+    for patient in error_patient:
+        if class_of_error_patient == 0:
+            values.append([patient, class_of_error_patient, 0.0])
+
+        elif class_of_error_patient == 1:
+            values.append([patient, class_of_error_patient, 1.0])
 
     final_df = pd.DataFrame(values)
     final_df.to_csv(path+'/output/output.csv', sep = ',', header = False, index = False)
@@ -37,7 +43,7 @@ def export_csv(patient_num, y_pred_binary, y_pred, path="/data", index=None):
     return y_pred_binary, final_df
 
 
-def making_result(S_train, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, Y, models=[1,3,4,5,7,10]):
+def making_result(S_train, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, Y, models=[1,3,4,10]):
 
     values = [list(s)+[p0, p1, p2, p3, pb0, pb1, pb2, pb3, pp0, pp1, pp2, pp3, ppb0, ppb1, ppb2, ppb3 ,y] 
               for s, p0, p1, p2, p3, pb0, pb1, pb2, pb3, pp0, pp1, pp2, pp3, ppb0, ppb1, ppb2, ppb3 ,y

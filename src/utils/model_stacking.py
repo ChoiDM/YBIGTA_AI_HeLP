@@ -13,7 +13,7 @@ import numpy as np
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 
-def stacking(models, data, exclude=[2,6,8,9], predict_binary=["None"], layer=1) : 
+def stacking(models, data, exclude=[2,5,6,7,8,9], predict_binary=["None"], layer=1) : 
     result = []
     
     if layer == 1:

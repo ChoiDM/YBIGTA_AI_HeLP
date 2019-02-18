@@ -29,7 +29,7 @@ print("Start:", time, "\n")
 # Print Information
 name = 'KHW'
 model = 'ML Stacking'
-summary = 'HyperParams tuning with 6 sklearn models + 4 stacking model  + 1 stacking model(weight)'
+summary = 'HyperParams tuning with 4 sklearn models + 4 stacking model  + 1 stacking model(weight)'
 
 print('Author Name :', name)
 print('Model :', model)
@@ -47,15 +47,12 @@ target_voxel = (0.65, 0.65, 3)
 do_n4 = False
 do_ws = True
 do_resample = True
-
 do_shuffle = True
-save_to_disk = False
-return_patient_num = False
 
 
 # Data Load
 print("\n---------- Data Load ----------")
-X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num, features, target_voxel)
+X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample, do_shuffle, features, target_voxel)
 
 
 #########################################################################################################################
@@ -66,11 +63,13 @@ X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample
 # Fit ML model with training data
 print("\n---------- Start ML Train ----------")
 cv=5
+BETA=0.75
 
 #########
 ## scorer
 def new_scorer(y_true, y_pred, threshold=0.5) :
     result = []
+    global BETA
 
     for pred in list(y_pred) :
         if pred >= threshold :
@@ -78,9 +77,9 @@ def new_scorer(y_true, y_pred, threshold=0.5) :
         else :
             result.append(0)
             
-    return fbeta_score(y_true, np.array(result), beta=0.5)
+    return fbeta_score(y_true, np.array(result), beta=BETA)
 
-scorer = make_scorer(fbeta_score, beta=0.5)
+scorer = make_scorer(fbeta_score, beta=BETA)
 
 #########
 ## model1
@@ -96,8 +95,6 @@ m1_params1 = {
     'probability' : [True],
     'learning_rate' : [0.01, 0.05, 0.1],
     'n_estimators' : [300, 500, 700]
-    
-    
 }
 
 m1_grid_1 = GridSearchCV(model1, param_grid=m1_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)

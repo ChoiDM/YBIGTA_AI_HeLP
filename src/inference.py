@@ -31,14 +31,9 @@ do_n4 = False
 do_ws = True
 do_resample = True
 
-do_shuffle = False
-save_to_disk = False
-return_patient_num = True
-
-
 # Data Load
 print("\n---------- Data Load ----------")
-X_test, patient_num = test_data_loader(test_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num, features, target_voxel)
+X_test, patient_num, error_patient = test_data_loader(test_dir, do_n4, do_ws, do_resample, features, target_voxel)
 
 
 #########################################################################################################################
@@ -127,7 +122,7 @@ for meta in models3 :
     y_pred_binary_lst2.append(pred_to_binary(pred, threshold = threshold))
 
 # Make 'output.csv'
-final, final_df = export_csv(patient_num, y_pred_binary_lst2, y_pred_lst2, path = path, index=3)
+final, final_df = export_csv(patient_num, error_patient, y_pred_binary_lst2, y_pred_lst2, path = path, index=3)
 print(making_result(S_test, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, final))
 print("\n\n\n----------------------------")
 print("---------- Result ----------")
