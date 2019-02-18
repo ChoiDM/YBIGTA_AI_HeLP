@@ -10,10 +10,11 @@ from utils.N4Correction import n4correction
 from utils.Resample import resample, mask2binary
 from utils.WhiteStripeNormalization import ws_normalize
 from utils.FeatureExtract import feature_extract
+from utils.Normalization import normalization
 
 
 # Feature Extraction for Train
-def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/negative/', do_n4=True, do_ws=True,
+def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/negative/', norm='new',
                       do_resample=True, do_shuffle=True,
                       features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3)):
     # File List
@@ -70,13 +71,23 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
                 time = str(datetime.datetime.now()).split()[1].split('.')[0]
                 print(">>> Finished : N4 Bias Correction ({})".format(time))
 
-            # Pre-processing (3)- White-stripe Normalization
-            if do_ws:
-                # ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
+            # Pre-processing (3)- Normalization
+            if norm == 'new':
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
-
+                
                 time = str(datetime.datetime.now()).split()[1].split('.')[0]
                 print(">>> Finished : White-stripe Normalization ({})".format(time))
+                
+            elif norm == 'ws':
+                FLAIR_array = normalization(FLAIR_array, INFARCT_array)
+
+                time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                print(">>> Finished : New Normalization ({})".format(time))
+                
+            else:
+                print("Value of 'norm' parameter should be 'new' of 'ws'")
+                raise ValueError
+
 
             # Feature Extraction by Radiomics
             ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array, features)
@@ -137,13 +148,22 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
                 time = str(datetime.datetime.now()).split()[1].split('.')[0]
                 print(">>> Finished : N4 Bias Correction ({})".format(time))
 
-            # Pre-processing (3)- White-stripe Normalization
-            if do_ws:
-                # ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
+            # Pre-processing (3)- Normalization
+            if norm == 'new':
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
-
-                time = time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                
+                time = str(datetime.datetime.now()).split()[1].split('.')[0]
                 print(">>> Finished : White-stripe Normalization ({})".format(time))
+                
+            elif norm == 'ws':
+                FLAIR_array = normalization(FLAIR_array, INFARCT_array)
+
+                time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                print(">>> Finished : New Normalization ({})".format(time))
+                
+            else:
+                print("Value of 'norm' parameter should be 'new' of 'ws'")
+                raise ValueError
 
             # Feature Extraction by Radiomics
             ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array, features)
@@ -233,13 +253,22 @@ def test_data_loader(test_dir='/data/test/', do_n4=True, do_ws=True, do_resample
                 time = str(datetime.datetime.now()).split()[1].split('.')[0]
                 print(">>> Finished : N4 Bias Correction ({})".format(time))
 
-            # Pre-processing (3)- White-stripe Normalization
-            if do_ws:
-                # ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
+            # Pre-processing (3)- Normalization
+            if norm == 'new':
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
-
+                
                 time = str(datetime.datetime.now()).split()[1].split('.')[0]
                 print(">>> Finished : White-stripe Normalization ({})".format(time))
+                
+            elif norm == 'ws':
+                FLAIR_array = normalization(FLAIR_array, INFARCT_array)
+
+                time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                print(">>> Finished : New Normalization ({})".format(time))
+                
+            else:
+                print("Value of 'norm' parameter should be 'new' of 'ws'")
+                raise ValueError
 
             # Feature Extraction by Radiomics
             ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array, features)
