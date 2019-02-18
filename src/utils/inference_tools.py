@@ -8,9 +8,9 @@ def pred_to_binary(pred_array, threshold = 0.5):
     
     if threshold == "auto" :
         pred_binary = sorted(list(pred_array))
-        threshold = pred_binary[int(len(pred_binary)*6/10)]
+        threshold = pred_binary[int(len(pred_binary)*4/10)]
         
-        pred_binary = np.array(pred_binary)
+        pred_binary = np.copy(pred_array)
         pred_binary[pred_binary > threshold] = 1
         pred_binary[pred_binary <= threshold] = 0
         
@@ -43,11 +43,11 @@ def export_csv(patient_num, error_patient, y_pred_binary, y_pred, path="/data", 
     return y_pred_binary, final_df
 
 
-def making_result(S_train, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, Y, models=[1,3,4,10]):
+def making_result(S, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, Y, models=[1,3,4,10]):
 
     values = [list(s)+[p0, p1, p2, p3, pb0, pb1, pb2, pb3, pp0, pp1, pp2, pp3, ppb0, ppb1, ppb2, ppb3 ,y] 
               for s, p0, p1, p2, p3, pb0, pb1, pb2, pb3, pp0, pp1, pp2, pp3, ppb0, ppb1, ppb2, ppb3 ,y
-              in zip(S_train, 
+              in zip(S, 
                      y_pred_lst[0], y_pred_lst[1], y_pred_lst[2], y_pred_lst[3],
                      y_pred_binary_lst[0], y_pred_binary_lst[1], y_pred_binary_lst[2], y_pred_binary_lst[3], 
                      y_pred_lst2[0], y_pred_lst2[1], y_pred_lst2[2], y_pred_lst2[3],

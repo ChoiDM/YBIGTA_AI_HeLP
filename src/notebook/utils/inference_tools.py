@@ -8,9 +8,9 @@ def pred_to_binary(pred_array, threshold = 0.5):
     
     if threshold == "auto" :
         pred_binary = sorted(list(pred_array))
-        threshold = pred_binary[int(len(pred_binary)*6/10)]
+        threshold = pred_binary[int(len(pred_binary)*4/10)]
         
-        pred_binary = np.array(pred_binary)
+        pred_binary = np.copy(pred_array)
         pred_binary[pred_binary > threshold] = 1
         pred_binary[pred_binary <= threshold] = 0
         
