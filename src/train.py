@@ -331,10 +331,10 @@ print("\n---------- Layer1 ----------")
 models = [best_model1, best_model2, best_model3, best_model4, best_model5, best_model6, best_model7, best_model8, best_model9, best_model10]
 S_train = stacking(models, X_train)
 
-meta_xgb = stacking_xgb(S_train, y_train, cv=2)
-meta_logistic = stacking_logistic(S_train, y_train, cv=2)
-meta_NN = stacking_NN(S_train, y_train, cv=2)
-meta_weight = stacking_weight(S_train, y_train, cv=2)
+meta_xgb = stacking_xgb(S_train, y_train, cv=cv)
+meta_logistic = stacking_logistic(S_train, y_train, cv=cv)
+meta_NN = stacking_NN(S_train, y_train, cv=cv)
+meta_weight = stacking_weight(S_train, y_train, cv=cv)
 
 y_pred_lst = []
 y_pred_binary_lst =[]
@@ -349,10 +349,10 @@ print("\n---------- Layer2 ----------")
 models2 = [meta_xgb, meta_logistic, meta_NN, meta_weight]
 S_train2 = stacking(models2, S_train, layer=2)
 
-meta_xgb2 = stacking_xgb(S_train2, y_train, cv=2)
-meta_logistic2 = stacking_logistic(S_train2, y_train, cv=2)
-meta_NN2 = stacking_NN(S_train2, y_train, cv=2)
-meta_weight2 = stacking_weight(S_train2, y_train, cv=2)
+meta_xgb2 = stacking_xgb(S_train2, y_train, cv=cv)
+meta_logistic2 = stacking_logistic(S_train2, y_train, cv=cv)
+meta_NN2 = stacking_NN(S_train2, y_train, cv=cv)
+meta_weight2 = stacking_weight(S_train2, y_train, cv=cv)
 
 y_pred_lst2 = []
 y_pred_binary_lst2 =[]
