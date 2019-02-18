@@ -63,15 +63,7 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
             print(">>> Unique Value of BRAIN mask :", np.unique(BRAIN_array))
             print(">>> Unique Value of INFARCT mask :", np.unique(INFARCT_array))
 
-            # Pre-processing (2)- N4 Bias Correction
-            if do_n4:
-                ADC_array = n4correction(ADC_array)
-                FLAIR_array = n4correction(FLAIR_array)
-
-                time = str(datetime.datetime.now()).split()[1].split('.')[0]
-                print(">>> Finished : N4 Bias Correction ({})".format(time))
-
-            # Pre-processing (3)- Normalization
+            # Pre-processing (2)- Normalization
             if norm == 'new':
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
                 
@@ -140,15 +132,7 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
             print(">>> Unique Value of BRAIN mask :", np.unique(BRAIN_array))
             print(">>> Unique Value of INFARCT mask :", np.unique(INFARCT_array))
 
-            # Pre-processing (2)- N4 Bias Correction
-            if do_n4:
-                ADC_array = n4correction(ADC_array)
-                FLAIR_array = n4correction(FLAIR_array)
-
-                time = str(datetime.datetime.now()).split()[1].split('.')[0]
-                print(">>> Finished : N4 Bias Correction ({})".format(time))
-
-            # Pre-processing (3)- Normalization
+            # Pre-processing (2)- Normalization
             if norm == 'new':
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
                 
@@ -245,15 +229,7 @@ def test_data_loader(test_dir='/data/test/', do_n4=True, do_ws=True, do_resample
             print(">>> Unique Value of BRAIN mask :", np.unique(BRAIN_array))
             print(">>>Unique Value of INFARCT mask :", np.unique(INFARCT_array))
 
-            # Pre-processing (2)- N4 Bias Correction
-            if do_n4:
-                ADC_array = n4correction(ADC_array)
-                FLAIR_array = n4correction(FLAIR_array)
-
-                time = str(datetime.datetime.now()).split()[1].split('.')[0]
-                print(">>> Finished : N4 Bias Correction ({})".format(time))
-
-            # Pre-processing (3)- Normalization
+            # Pre-processing (2)- Normalization
             if norm == 'new':
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
                 
