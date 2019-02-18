@@ -14,8 +14,7 @@ test_dir = '/data/test/'
 features = ['firstorder', 'shape']
 target_voxel = (0.65, 0.65, 3)
 
-do_n4 = False
-do_ws = True
+norm = 'new' # 'norm' should be 'ws' or 'new'
 do_resample = True
 
 threshold = 0.629
@@ -23,7 +22,7 @@ class_of_error_patient = 0
 
 
 # Data Load
-X_test, patient_num, error_patient = test_data_loader(test_dir, do_n4, do_ws, do_resample, features, target_voxel)
+X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, features, target_voxel)
 
 
 #########################################################################################################################
