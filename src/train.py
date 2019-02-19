@@ -64,6 +64,7 @@ xgb_params = {
 }
 
 log_params = {
+    'solver': ['liblinear'],
     'penalty': ['l1', 'l2'],
     'tol': [1e-3, 1e-4, 1e-5],
     'C': [0.5, 1, 2],
@@ -72,13 +73,17 @@ log_params = {
 sgd_params = {
     'penalty': ['l1', 'l2', 'elasticnet'],
     'alpha': [1e-3, 1e-4, 1e-5],
+    'tol': [1e-3, 1e-4, 1e-5],
     'max_iter': [1e+3, 2e+3, 4e+3]
 }
 
 svc_params = {
     'penalty': ['l1', 'l2'],
+    'loss': ['squared_hinge'],
     'tol': [1e-3, 1e-4, 1e-5],
     'C': [0.5, 1, 2],
+    'max_iter': [1e+4],
+    'dual': [False],
 }
 
 # ----------------------- Number of Combinations -------------------------- #
@@ -97,17 +102,17 @@ scorer = make_scorer(fbeta_score, beta=0.5)
 xgb_base = xgb.XGBClassifier(learning_rate=0.01, n_estimators=600, objective='binary:logistic', silent=True, nthread=1)
 log_base = LogisticRegression()
 sgd_base = SGDClassifier()
-svc_base = LinearSVC(dual=False)
+svc_base = LinearSVC()
 bases = [xgb.XGBClassifier, LogisticRegression, SGDClassifier, LinearSVC]
 
-xgb_model = RandomizedSearchCV(xgb_base, xgb_params, cv=5, scoring=scorer, verbose=3, n_jobs=-1)
-log_model = RandomizedSearchCV(log_base, log_params, cv=5, scoring=scorer, verbose=3, n_jobs=-1)
-sgd_model = RandomizedSearchCV(sgd_base, sgd_params, cv=5, scoring=scorer, verbose=3, n_jobs=-1)
-svc_model = RandomizedSearchCV(svc_base, svc_params, cv=5, scoring=scorer, verbose=3, n_jobs=-1)
+xgb_model = GridSearchCV(xgb_base, xgb_params, cv=5, scoring=scorer, verbose=3, n_jobs=-1)
+log_model = GridSearchCV(log_base, log_params, cv=5, scoring=scorer, verbose=3, n_jobs=-1)
+sgd_model = GridSearchCV(sgd_base, sgd_params, cv=5, scoring=scorer, verbose=3, n_jobs=-1)
+svc_model = GridSearchCV(svc_base, svc_params, cv=5, scoring=scorer, verbose=3, n_jobs=-1)
 models = [xgb_model, log_model, sgd_model, svc_model]
 
 # -------------------------- 1st Model fitting ----------------------------- #
-
+print("------------------ First model fitting ------------------")
 for model in models:
     model.fit(X_train, y_train)
 
@@ -117,6 +122,7 @@ for model in models:
 estimators = []
 for comb, model, base in zip(combos, models, bases):
     n = comb // 10 + 2  # use top 10% of the models
+    print("Using top {} models out of {} models".format(n, comb))
 
     df = pd.DataFrame(model.cv_results_)
     score = df['mean_train_score']
@@ -128,7 +134,8 @@ for comb, model, base in zip(combos, models, bases):
     for i, p in enumerate(params):
         estimators.append((base.__name__ + '_' + str(i), base(**p)))
 
-
+print("Total: {} estimators".format(len(estimators)))
+print("-------------- Ensemble fitting ------------------")
 final_model = VotingClassifier(estimators=estimators, voting="hard")
 
 
