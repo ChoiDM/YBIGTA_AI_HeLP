@@ -11,6 +11,7 @@ from utils.Resample import resample, mask2binary
 from utils.WhiteStripeNormalization import ws_normalize
 from utils.FeatureExtract import feature_extract
 from utils.Normalization import normalization
+from utils.augmentation import random_rotation, random_noise, horizontal_flip
 
 
 # Feature Extraction for Train
@@ -92,6 +93,20 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
             y.append(1)
             patient_num.append(pos_patient)
 
+            # --- flipped data --- #
+            ADC_array_fl = horizontal_flip(ADC_array)
+            FLAIR_array_fl = horizontal_flip(FLAIR_array)
+            INFARCT_array_fl = horizontal_flip(INFARCT_array)
+
+            ADC_values, ADC_columns = feature_extract(ADC_array_fl, INFARCT_array_fl, features)
+            FLAIR_values, FLAIR_columns = feature_extract(FLAIR_array_fl, INFARCT_array_fl, features)
+            total_values = ADC_values + FLAIR_values
+
+            X.append(total_values)
+            y.append(1)
+            patient_num.append(pos_patient)
+            # --- END: flipped data --- #
+
 
         except Exception as ex:
             time = str(datetime.datetime.now()).split()[1].split('.')[0]
@@ -159,6 +174,20 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
             X.append(total_values)
             y.append(0)
             patient_num.append(neg_patient)
+
+            # --- flipped data --- #
+            ADC_array_fl = horizontal_flip(ADC_array)
+            FLAIR_array_fl = horizontal_flip(FLAIR_array)
+            INFARCT_array_fl = horizontal_flip(INFARCT_array)
+
+            ADC_values, ADC_columns = feature_extract(ADC_array_fl, INFARCT_array_fl, features)
+            FLAIR_values, FLAIR_columns = feature_extract(FLAIR_array_fl, INFARCT_array_fl, features)
+            total_values = ADC_values + FLAIR_values
+
+            X.append(total_values)
+            y.append(0)
+            patient_num.append(neg_patient)
+            # --- END: flipped data --- #
 
 
         except Exception as ex:
