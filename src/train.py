@@ -29,7 +29,7 @@ print("Start:", time, "\n")
 # Print Information
 name = 'KHW'
 model = 'ML Stacking'
-summary = 'HyperParams tuning with 4 sklearn models + 4 stacking model  + 1 stacking model(xgb) + BETA=0.75 + cv=5'
+summary = 'HyperParams tuning with 4 sklearn models + 4 stacking model  + 1 stacking model(NN) + BETA=0.75 + cv=5'
 
 print('Author Name :', name)
 print('Model :', model)
