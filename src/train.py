@@ -3,8 +3,8 @@ from utils.data_loader import train_data_loader
 from utils import utils
 import xgboost as xgb
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
-from sklearn.linear_model import LogisticRegression, SGDClassifier, LinearSVC
-from sklearn.lda import LDA
+from sklearn.linear_model import LogisticRegression, SGDClassifier
+from sklearn.svm import LinearSVC
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.metrics import fbeta_score, make_scorer
 import pickle
@@ -15,7 +15,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Print Current Time
-print(f"File: {__file__} | Start:", utils.now())
+print("File: {} | Start:".format(__file__), utils.now())
 
 
 # Print Information
@@ -48,7 +48,7 @@ do_shuffle = True
 
 
 # Data Load
-X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num)
+X_train, y_train = train_data_loader(pos_dir, neg_dir, norm, do_resample, do_shuffle, features, target_voxel)
 
 
 # ---------------------- Model parameters definition ----------------------- #
@@ -76,12 +76,11 @@ xgb_base = xgb.XGBClassifier(learning_rate=0.01, n_estimators=600, objective='bi
 
 xgb_model = RandomizedSearchCV(xgb_base, xgb_params, cv=5, scoring=make_scorer(fbeta_score, beta=0.5),
                                verbose=3, n_jobs=-1)
-lda_model = LDA()
 logistic = LogisticRegression()
 sgd = SGDClassifier()
 svc = LinearSVC()
 
-final_model = VotingClassifier(estimators=[xgb_model, lda_model, logistic, sgd, svc], voting="hard")
+final_model = VotingClassifier(estimators=[('xgb', xgb_model), ('logistic', logistic), ('sgd', sgd), ('svc', svc)], voting="hard")
 
 
 # ---------------------------- Model fitting ------------------------------- #

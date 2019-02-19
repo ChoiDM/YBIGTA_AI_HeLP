@@ -184,7 +184,7 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
 
 
 # Feature Extraction for Inference
-def test_data_loader(test_dir='/data/test/', norm, do_resample=True, features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3)):
+def test_data_loader(test_dir='/data/test/', norm="new", do_resample=True, features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3)):
     # File List
     test_file_list = glob(test_dir + "*")
     test_patient_list = list(set([path.split('_')[0] for path in os.listdir(test_dir)]))
