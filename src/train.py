@@ -15,7 +15,7 @@ print("Start:", time)
 # Print Information
 name = 'master-branch'
 model = 'XGBoost'
-summary = 'Parameter from Grid-Search (subsample=1.0, gamma=2, colsample_bytree=0.8, max_depth=6, min_child_weight=10)'
+summary = 'Normalization with new method / Threshold to 0.70'
 
 print('---------------------------')
 print('Author Name :', name)
