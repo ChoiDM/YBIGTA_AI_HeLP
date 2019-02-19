@@ -29,7 +29,7 @@ print("Start:", time, "\n")
 # Print Information
 name = 'KHW'
 model = 'ML Stacking'
-summary = 'HyperParams tuning with 4 sklearn models + 4 stacking model  + 1 stacking model(weight)'
+summary = 'HyperParams tuning with 4 sklearn models + 4 stacking model  + 1 stacking model(xgb) + BETA=0.75 + cv=5'
 
 print('Author Name :', name)
 print('Model :', model)
@@ -86,6 +86,10 @@ scorer = make_scorer(fbeta_score, beta=BETA)
 print("model1")
 model1 = XGBClassifier()
 
+m1_params1 = {'subsample': [0.6], 'colsample_bytree': [0.6], 'min_child_weight': [0.5], 'probability': [True], 
+              'gamma': [3.0], 'n_estimators': [300], 'learning_rate': [0.01], 'max_depth': [7]}
+
+"""
 m1_params1 = {
     'max_depth' : [5,6,7,8],
     'min_child_weight' : [0.5, 1, 5, 10, 15, 20],
@@ -94,9 +98,8 @@ m1_params1 = {
     'colsample_bytree' : [0.5, 0.6, 0.8, 1.0],
     'probability' : [True],
     'learning_rate' : [0.01, 0.05, 0.1],
-    'n_estimators' : [300, 500, 700]
-}
-
+    'n_estimators' : [300, 500, 700]}
+"""
 m1_grid_1 = GridSearchCV(model1, param_grid=m1_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m1_grid_1.fit(X_train, y_train)
 
@@ -110,12 +113,15 @@ print("Best Params : {}".format(m1_grid_1.best_params_))
 print("\nmodel2")
 model2 = SVC()
 
+m2_params1 = {'probability': [True], 'degree': [2], 'C': [0.001], 'gamma': [0.001]}
+
+"""
 m2_params1 = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100], 
     'gamma' : [0.001, 0.01, 0.1, 1, 2, 5, 10, 20],
     'degree' : [2,3,4],
-    'probability' : [True]
-}
+    'probability' : [True]}
+"""
 
 m2_grid_1 = GridSearchCV(model2, param_grid=m2_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m2_grid_1.fit(X_train, y_train)
@@ -132,8 +138,7 @@ model3 = LogisticRegression()
 
 m3_params1 = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100],
-    'max_iter' : [n for n in range(100,1101, 200)],
-}
+    'max_iter' : [n for n in range(100,1101, 200)]}
 
 m3_grid_1 = GridSearchCV(model3, param_grid=m3_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m3_grid_1.fit(X_train, y_train)
@@ -148,11 +153,14 @@ print("Best Params : {}".format(m3_grid_1.best_params_))
 print("\nmodel4")
 model4 = RandomForestClassifier()
 
+m4_params1 = {'n_estimators': [500], 'min_samples_leaf': [50], 'max_depth': [15]}
+
+"""
 m4_params1 = {
     'max_depth' : [6, 8, 10, 15, 20, 30, 40, 50],
     'min_samples_leaf': [1, 2, 3, 4, 5,10, 20, 50],
-    'n_estimators' : [100, 300, 500]
-}
+    'n_estimators' : [100, 300, 500]}
+"""
 
 m4_grid_1 = GridSearchCV(model4, param_grid=m4_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m4_grid_1.fit(X_train, y_train)
@@ -167,11 +175,14 @@ print("Best Params : {}".format(m4_grid_1.best_params_))
 print("\nmodel5")
 model5 = LogisticRegression()
 
+m5_params1 = {'penalty': ['l1'], 'C': [1], 'max_iter': [900]}
+
+"""
 m5_params1 = {
     'C': [0.001, 0.01, 0.1, 1, 10, 100],
     'max_iter' : [n for n in range(100,1101, 200)],
-    'penalty' : ["l1"]
-}
+    'penalty' : ["l1"]}
+"""
 
 m5_grid_1 = GridSearchCV(model5, param_grid=m5_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m5_grid_1.fit(X_train, y_train)
@@ -186,10 +197,13 @@ print("Best Params : {}".format(m5_grid_1.best_params_))
 print("\nmodel6")
 model6 = RidgeClassifier()
 
+m6_params1 = {'alpha': [10], 'max_iter': [None]}
+
+"""
 m6_params1 = {
     'alpha': [0.1, 1, 2, 5, 10, 20, 50, 100],
-    'max_iter' : [None]+[n for n in range(100,1101, 200)]
-}
+    'max_iter' : [None]+[n for n in range(100,1101, 200)]}
+"""
 
 m6_grid_1 = GridSearchCV(model6, param_grid=m6_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m6_grid_1.fit(X_train, y_train)
@@ -204,13 +218,16 @@ print("Best Params : {}".format(m6_grid_1.best_params_))
 print("\nmodel7")
 model7 = SGDClassifier()
 
+m7_params1 = {'penalty': ['elasticnet'], 'loss': ['log'], 'alpha': [100], 'l1_ratio': [0.5], 'max_iter': [1400]}
+
+"""
 m7_params1 = {
     'alpha': [0.001, 0.01, 0.1, 1, 2, 5, 10, 20, 50, 100],
     'l1_ratio':[0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7], 
     'max_iter' : [None]+[n for n in range(800, 1601, 200)],
     'penalty' : ["elasticnet"],
-    'loss' : ["log"]
-}
+    'loss' : ["log"]}
+"""
 
 m7_grid_1 = GridSearchCV(model7, param_grid=m7_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m7_grid_1.fit(X_train, y_train)
@@ -225,9 +242,12 @@ print("Best Params : {}".format(m7_grid_1.best_params_))
 print("\nmodel8")
 model8 = Lars()
 
+m8_params1 = {'n_nonzero_coefs': [70]}
+
+"""
 m8_params1 = {
-    'n_nonzero_coefs': [n for n in range(30, 150, 20)]
-}
+    'n_nonzero_coefs': [n for n in range(30, 150, 20)]}
+"""
 
 max_score=0
 m8_best_t = 0
@@ -256,10 +276,13 @@ print("Best Params : {}".format(m8_grid_1.best_params_))
 print("\nmodel9")
 model9 = LassoLars()
 
+m9_params1 = {'alpha': [0.1], 'max_iter': [800]}
+
+"""
 m9_params1 = {
     'alpha': [0.1, 1, 2, 5, 10, 20, 50, 100],
-    'max_iter' : [n for n in range(800, 1601, 200)]
-}
+    'max_iter' : [n for n in range(800, 1601, 200)]}
+"""
 
 max_score=0
 m9_best_t = 0
@@ -287,10 +310,13 @@ print("Best Params : {}".format(m9_grid_1.best_params_))
 print("\nmodel10")
 model10 = ExtraTreesClassifier()
 
+m10_params1 = {'n_estimators': [50], 'max_depth': [3]}
+
+"""
 m10_params1 = {
     'max_depth' : [None, 3, 5, 7, 9],
-    'n_estimators' : [10, 50, 100, 300, 500]
-}
+    'n_estimators' : [10, 50, 100, 300, 500]}
+"""
 
 m10_grid_1 = GridSearchCV(model10, param_grid=m10_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
 m10_grid_1.fit(X_train, y_train)

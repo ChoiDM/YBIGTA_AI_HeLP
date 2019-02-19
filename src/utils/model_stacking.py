@@ -36,6 +36,10 @@ def stacking(models, data, exclude=[2,5,6,7,8,9], predict_binary=["None"], layer
 
 def stacking_xgb(S_train, y_train, cv=5) :
     stacking_xgb = XGBClassifier()
+    
+    stacking_xgb_params1 = {'n_estimators': [50], 'max_depth': [3]}
+    
+    """
     stacking_xgb_params1 = {
         'max_depth' : [2,3],
         'min_child_weight' : [0.5, 1, 5, 10],
@@ -46,6 +50,7 @@ def stacking_xgb(S_train, y_train, cv=5) :
         'learning_rate' : [0.01, 0.05, 0.1],
         'n_estimators' : [100, 200, 300]
     }
+    """
     
     scorer = make_scorer(fbeta_score, beta=0.5)
     stacking_xgb_grid_1 = GridSearchCV(stacking_xgb, param_grid=stacking_xgb_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
@@ -60,10 +65,15 @@ def stacking_xgb(S_train, y_train, cv=5) :
     
 def stacking_logistic(S_train, y_train, cv=5) :
     stacking_lr = LogisticRegression()
+    
+    stacking_lr_params1 = {'C': [10], 'max_iter': [100]}
+    
+    """
     stacking_lr_params1 = {
         'C': [0.001, 0.01, 0.1, 1, 10],
         'max_iter' : [n for n in range(100, 1101, 200)],
     }
+    """
 
     scorer = make_scorer(fbeta_score, beta=0.5)
     stacking_lr_grid_1 = GridSearchCV(stacking_lr, param_grid=stacking_lr_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)

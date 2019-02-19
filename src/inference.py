@@ -122,7 +122,7 @@ for meta in models3 :
     y_pred_binary_lst2.append(pred_to_binary(pred, threshold = threshold))
 
 # Make 'output.csv'
-final, final_df = export_csv(patient_num, error_patient, y_pred_binary_lst2, y_pred_lst2, path = path, index=3)
+final, final_df = export_csv(patient_num, error_patient, y_pred_binary_lst2, y_pred_lst2, path = path, index=2)
 print(making_result(S_test, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, final))
 print("\n\n\n----------------------------")
 print("---------- Result ----------")
