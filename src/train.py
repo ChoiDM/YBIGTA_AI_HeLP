@@ -22,8 +22,9 @@ print("File: {} | Start:".format(__file__), utils.now())
 
 # Print Information
 name = 'Semin #2'
-model = 'XGBoost + Logistic Regression + SVM | RandomSearchCV'
-summary = '''Experiment: Ensemble {XGBoost, Logistic Regression, LDA, SVM} + data augmentation through horizontal flipping'''
+model = 'Hyper ensemble with XGBoost + Logistic Regression + SVM | RandomSearchCV'
+summary = '''Hyper Ensemble {XGBoost, Logistic Regression, LDA, SVM} + data augmentation through horizontal flipping.
+Uses approx. 50 models'''
 
 
 print('---------------------------')
@@ -115,7 +116,7 @@ for model in models:
 
 estimators = []
 for comb, model, base in zip(combos, models, bases):
-    n = comb // 10  # use top 10% of the models
+    n = comb // 10 + 2  # use top 10% of the models
 
     df = pd.DataFrame(model.cv_results_)
     score = df['mean_train_score']
