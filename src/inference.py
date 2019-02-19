@@ -5,43 +5,43 @@ import pandas as pd
 import xgboost as xgb
 import pickle
 
-import warnings
-warnings.filterwarnings('ignore')
-
 print("File: inference.py | Start:", utils.now())
 
 # Setting
 test_dir = '/data/test/'
 
-do_n4 = False
-do_ws = True
+features = ['firstorder', 'shape']
+target_voxel = (0.65, 0.65, 3)
+
+norm = 'new' # 'norm' should be 'ws' or 'new'
 do_resample = True
 
-do_shuffle = False
-save_to_disk = False
-return_patient_num = True
+threshold = 0.70
+class_of_error_patient = 0
 
 
 # Data Load
-X_test, patient_num = test_data_loader(test_dir, do_n4, do_ws, do_resample, do_shuffle, save_to_disk, return_patient_num)
+X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, features, target_voxel)
 
-
-#########################################################################################################################
-#########################################################################################################################
-#### Modify here ####
+# ---------------------------------------- Modify here ---------------------------------------- #
 
 
 # Load trained model
-model = pickle.load(open('/data/model/model.pickle.dat', 'rb'))
-
+xgb = pickle.load(open('/data/model/xgb_model.pickle.dat', 'rb'))
+lda = pickle.load(open('/data/model/lda_model.pickle.dat', 'rb'))
+log = pickle.load(open('/data/model/logistic.pickle.dat', 'rb'))
+sgd = pickle.load(open('/data/model/sgd.pickle.dat', 'rb'))
+svc = pickle.load(open('/data/model/svc.pickle.dat', 'rb'))
 
 # Make Predictions for Test Data
-y_pred = model.predict_proba(X_test)[:, 1]
+y_pred_xgb = xgb.predict_proba(X_test)[:, 1]
+y_pred_rf = rf_model.predict_proba(X_test)[:, 1]
+
+weight = 0.8
+y_pred = weight * y_pred_xgb + (1-weight) * y_pred_rf
+
 y_pred_binary = pred_to_binary(y_pred, threshold = 0.5)
 
 
 # Make 'output.csv'
-df = make_df(patient_num, y_pred_binary, y_pred)
-df.columns = ["Number", "Binary", "Proba"]
-print(df)
-export_csv(df)
+export_csv(patient_num, error_patient, class_of_error_patient, y_pred_binary, y_pred)
