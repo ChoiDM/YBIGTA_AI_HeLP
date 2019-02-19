@@ -1,12 +1,12 @@
 from __future__ import print_function
-import radiomics, logging
 from radiomics import featureextractor
 import radiomics
+import logging
+radiomics.logger.setLevel(logging.ERROR)
 import SimpleITK as sitk
 from radiomics import firstorder, glcm, shape, glrlm, glszm, ngtdm, gldm
 import numpy as np
 
-radiomics.logging.setLevel(logging.ERROR)
 
 def Numpy2Itk(array):
     '''
