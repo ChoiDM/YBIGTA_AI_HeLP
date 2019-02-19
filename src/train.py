@@ -19,9 +19,9 @@ print("File: {} | Start:".format(__file__), utils.now())
 
 
 # Print Information
-name = 'Semin #1'
-model = 'XGBoost + Logistic Regression + LDA + SVM | RandomSearchCV'
-summary = '''Experiment: Ensemble {XGBoost, Logistic Regression, LDA, SVM}'''
+name = 'Semin #2'
+model = 'XGBoost + Logistic Regression + SVM | RandomSearchCV'
+summary = '''Experiment: Ensemble {XGBoost, Logistic Regression, LDA, SVM} + data augmentation through horizontal flipping'''
 
 
 print('---------------------------')
