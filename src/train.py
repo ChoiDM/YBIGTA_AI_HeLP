@@ -2,7 +2,7 @@ import numpy as np
 from utils.data_loader import train_data_loader
 from utils import utils
 import xgboost as xgb
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.linear_model import LogisticRegression, SGDClassifier, LinearSVC
 from sklearn.lda import LDA
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
@@ -15,13 +15,13 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Print Current Time
-print("File: train.py | Start:", utils.now())
+print(f"File: {__file__} | Start:", utils.now())
 
 
 # Print Information
 name = 'Semin #1'
 model = 'XGBoost + Logistic Regression + LDA + SVM | RandomSearchCV'
-summary = '''Experiment: Ensemble a subset of {XGBoost} + {Logistic Regression, LDA, SVM}'''
+summary = '''Experiment: Ensemble {XGBoost, Logistic Regression, LDA, SVM}'''
 
 
 print('---------------------------')
@@ -35,13 +35,13 @@ print('---------------------------')
 pos_dir = "/data/train/positive/"
 neg_dir = "/data/train/negative/"
 
-do_n4 = False
-do_ws = True
+features = ['firstorder', 'shape']
+target_voxel = (0.65, 0.65, 3)
+
+norm = 'new' # 'norm' should be 'ws' or 'new'
 do_resample = True
 
 do_shuffle = True
-save_to_disk = False
-return_patient_num = False
 
 
 # ------------------------------------------ Modify here ------------------------------------------------ #
@@ -81,31 +81,39 @@ logistic = LogisticRegression()
 sgd = SGDClassifier()
 svc = LinearSVC()
 
+final_model = VotingClassifier(estimators=[xgb_model, lda_model, logistic, sgd, svc], voting="hard")
+
 
 # ---------------------------- Model fitting ------------------------------- #
-xgb_model.fit(X_train, y_train)
-lda_model.fit(X_train, y_train)
-logistic.fit(X_train, y_train)
-sgd.fit(X_train, y_train)
-svc.fit(X_train, y_train)
+# xgb_model.fit(X_train, y_train)
+# lda_model.fit(X_train, y_train)
+# logistic.fit(X_train, y_train)
+# sgd.fit(X_train, y_train)
+# svc.fit(X_train, y_train)
+
+final_model.fit(X_train, y_train)
+print(final_model)
 
 
-print("Base model: XGBoost")
-print("Best params:", xgb_model.best_params_)
-print("Best estimator:\n", xgb_model.best_estimator_)
-print()
 
-print("Rest of the models:")
-print(lda_model)
-print(logistic)
-print(sgd)
-print(svc)
+# print("Base model: XGBoost")
+# print("Best params:", xgb_model.best_params_)
+# print("Best estimator:\n", xgb_model.best_estimator_)
+# print()
+
+# print("Rest of the models:")
+# print(lda_model)
+# print(logistic)
+# print(sgd)
+# print(svc)
 
 
 
 # ----------------------------- Save model --------------------------------- #
-pickle.dump(xgb_model, open('/data/model/xgb_model.pickle.dat', 'wb'))
-pickle.dump(lda_model, open('/data/model/lda_model.pickle.dat', 'wb'))
-pickle.dump(logistic, open('/data/model/logistic.pickle.dat', 'wb'))
-pickle.dump(sgd, open('/data/model/sgd.pickle.dat', 'wb'))
-pickle.dump(svc, open('/data/model/svc.pickle.dat', 'wb'))
+# pickle.dump(xgb_model, open('/data/model/xgb_model.pickle.dat', 'wb'))
+# pickle.dump(lda_model, open('/data/model/lda_model.pickle.dat', 'wb'))
+# pickle.dump(logistic, open('/data/model/logistic.pickle.dat', 'wb'))
+# pickle.dump(sgd, open('/data/model/sgd.pickle.dat', 'wb'))
+# pickle.dump(svc, open('/data/model/svc.pickle.dat', 'wb'))
+
+pickle.dump(final_model, open('/data/model/final_model.pickle.dat', 'wb'))

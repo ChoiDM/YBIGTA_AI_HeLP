@@ -5,7 +5,7 @@ import pandas as pd
 import xgboost as xgb
 import pickle
 
-print("File: inference.py | Start:", utils.now())
+print(f"File: {__file__} | Start:", utils.now())
 
 # Setting
 test_dir = '/data/test/'
@@ -27,11 +27,12 @@ X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resampl
 
 
 # Load trained model
-xgb = pickle.load(open('/data/model/xgb_model.pickle.dat', 'rb'))
-lda = pickle.load(open('/data/model/lda_model.pickle.dat', 'rb'))
-log = pickle.load(open('/data/model/logistic.pickle.dat', 'rb'))
-sgd = pickle.load(open('/data/model/sgd.pickle.dat', 'rb'))
-svc = pickle.load(open('/data/model/svc.pickle.dat', 'rb'))
+# xgb = pickle.load(open('/data/model/xgb_model.pickle.dat', 'rb'))
+# lda = pickle.load(open('/data/model/lda_model.pickle.dat', 'rb'))
+# log = pickle.load(open('/data/model/logistic.pickle.dat', 'rb'))
+# sgd = pickle.load(open('/data/model/sgd.pickle.dat', 'rb'))
+# svc = pickle.load(open('/data/model/svc.pickle.dat', 'rb'))
+final_model = pickle.load(open('/data/model/final_model.pickle.dat', 'rb'))
 
 # Make Predictions for Test Data
 y_pred_xgb = xgb.predict_proba(X_test)[:, 1]
