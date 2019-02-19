@@ -8,6 +8,18 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
+# Print Information
+name = 'master-branch'
+model = 'XGBoost'
+summary = 'Normalization with new method / Threshold to 0.70'
+
+print('---------------------------')
+print('Author Name :', name)
+print('Model :', model)
+print('Summary :', summary)
+print('---------------------------')
+
+
 # Setting
 test_dir = '/data/test/'
 
