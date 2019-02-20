@@ -13,69 +13,69 @@ import numpy as np
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 
-def stacking(models, data, exclude=[2,5,6,7,8,9], predict_binary=["None"], layer=1) : 
+def stacking(models, data, include, predict_binary=[None]) : 
     result = []
     
-    if layer == 1:
-        for idx, model in enumerate(models) :
-            if idx+1 in exclude :
-                continue
-            if idx+1 in predict_binary :
-                result.append(model.predict(data))
-            else :
-                result.append(model.predict_proba(data)[:,1])
-            print("model", idx+1, "is stacked")
-    
-    elif layer == 2 :
-        for idx, model in enumerate(models) :
+    for idx, model in enumerate(models) :
+        if idx+1 not in include :
+            continue
+                
+        if idx+1 in predict_binary :
+            result.append(model.predict(data))
+        else :
             result.append(model.predict_proba(data)[:,1])
             print("model", idx+1, "is stacked")
-            
+ 
+    print("\n")
     return np.array(result).T
 
 
-def stacking_xgb(S_train, y_train, cv=5) :
-    stacking_xgb = XGBClassifier()
-    stacking_xgb_params1 = {
-        'max_depth' : [2,3],
-        'min_child_weight' : [0.5, 1, 5, 10],
-        'gamma' : [1.5, 2, 2.5, 3.0, 5],
-        'subsample' : [0.5, 0.6, 0.8, 1.0],
-        'colsample_bytree' : [0.5, 0.6, 0.8, 1.0],
-        'probability' : [True],
-        'learning_rate' : [0.01, 0.05, 0.1],
-        'n_estimators' : [100, 200, 300]
-    }
-    
+def stacking_xgb(S_train, y_train, stacking_params=None, cv=5) :
+    stacking_model = XGBClassifier()
     scorer = make_scorer(fbeta_score, beta=0.5)
-    stacking_xgb_grid_1 = GridSearchCV(stacking_xgb, param_grid=stacking_xgb_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
-    stacking_xgb_grid_1.fit(S_train, y_train)
+    
+    if not stacking_params :
+        stacking_params = {
+            'max_depth' : [2,3],
+            'min_child_weight' : [0.5, 1, 5, 10],
+            'gamma' : [1.5, 2, 2.5, 3.0, 5],
+            'subsample' : [0.5, 0.6, 0.8, 1.0],
+            'colsample_bytree' : [0.5, 0.6, 0.8, 1.0],
+            'probability' : [True],
+            'learning_rate' : [0.01, 0.05, 0.1],
+            'n_estimators' : [100, 200, 300]
+        }
+    
+    stacking_grid = GridSearchCV(stacking_model, param_grid=stacking_params, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
+    stacking_grid.fit(S_train, y_train)
 
-    meta_model = stacking_xgb_grid_1.best_estimator_
-    print("Best Score : {}".format(stacking_xgb_grid_1.best_score_))
-    print("Best Params : {}".format(stacking_xgb_grid_1.best_params_))
+    meta_model = stacking_grid.best_estimator_
+    print("Best Score : {}".format(stacking_grid.best_score_))
+    print("Best Params : {}".format(stacking_grid.best_params_))
     
     return meta_model
     
     
-def stacking_logistic(S_train, y_train, cv=5) :
-    stacking_lr = LogisticRegression()
-    stacking_lr_params1 = {
-        'C': [0.001, 0.01, 0.1, 1, 10],
-        'max_iter' : [n for n in range(100, 1101, 200)],
-    }
-
+def stacking_logistic(S_train, y_train, stacking_params=None, cv=5) :
+    stacking_model = LogisticRegression()
     scorer = make_scorer(fbeta_score, beta=0.5)
-    stacking_lr_grid_1 = GridSearchCV(stacking_lr, param_grid=stacking_lr_params1, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
-    stacking_lr_grid_1.fit(S_train, y_train)
+    
+    if not stacking_params :
+        stacking_params =  {
+            'C': [0.001, 0.01, 0.1, 1, 10],
+            'max_iter' : [n for n in range(100, 1101, 200)],
+        }
+    
+    stacking_grid = GridSearchCV(stacking_model, param_grid=stacking_params, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
+    stacking_grid.fit(S_train, y_train)
 
-    meta_model = stacking_lr_grid_1.best_estimator_
-    print("Best Score : {}".format(stacking_lr_grid_1.best_score_))
-    print("Best Params : {}".format(stacking_lr_grid_1.best_params_))
+    meta_model = stacking_grid.best_estimator_
+    print("Best Score : {}".format(stacking_grid.best_score_))
+    print("Best Params : {}".format(stacking_grid.best_params_))
+    
     return meta_model
     
-    
-def stacking_weight(S_train, y_train, cv=5) :
+def stacking_weight(S_train, y_train, cv=5, epochs=30) :
     def stack_fn(num_models=len(S_train[0])):
         model = Sequential()
         model.add(Dense(2, input_dim=num_models, activation='softmax'))
@@ -84,10 +84,10 @@ def stacking_weight(S_train, y_train, cv=5) :
         return model
     
     meta_model = KerasClassifier(build_fn=stack_fn)
-    meta_model.fit(S_train, y_train, epochs=30)
+    meta_model.fit(S_train, y_train, epochs=epochs)
     return meta_model
     
-def stacking_NN(S_train, y_train, cv=5) :
+def stacking_NN(S_train, y_train, cv=5, epochs=30) :
     def stack_fn(num_models=len(S_train[0])):
         model = Sequential()
         model.add(Dense(16, input_dim=num_models, activation='relu'))
@@ -98,7 +98,7 @@ def stacking_NN(S_train, y_train, cv=5) :
         return model
     
     meta_model = KerasClassifier(build_fn=stack_fn)
-    meta_model.fit(S_train, y_train, epochs=30)
+    meta_model.fit(S_train, y_train, epochs=epochs)
     return meta_model
 
 
