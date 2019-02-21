@@ -63,6 +63,7 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
             # Make Mask to Binary (0 or 1)
             BRAIN_array = mask2binary(BRAIN_array)
             INFARCT_array = mask2binary(INFARCT_array)
+            
             # Pre-processing (2)- Normalization
             if norm == 'ws':
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
@@ -81,7 +82,6 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
             else:
                 print("Value of 'norm' parameter should be 'new' of 'ws'")
                 raise ValueError
-
 
             # Feature Extraction by Radiomics
             ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array, features)
