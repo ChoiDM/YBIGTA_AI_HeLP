@@ -35,8 +35,8 @@ threshold = "auto"
 norm = 'new'
 include_model = [1,3,4,10,11,12]
 include_model2 = [1,2,3,4]
-include_model3 = [1,2]
-final_idx = 1
+include_model3 = []
+final_idx = 3
 
 
 # Data Load
@@ -84,18 +84,6 @@ meta_NN.model.load_weights(path+'/model/meta_NN.h5')
 with open(path+'/model/meta_weight.json', 'r') as f :
     meta_weight = model_from_json(f.read())
 meta_weight.model.load_weights(path+'/model/meta_weight.h5')
-
-
-# Load Stacking model 2
-print("\n---------- Stacking Model Load 2 ----------")
-
-with open(path+'/model/meta_NN2.json', 'r') as f :
-    meta_NN2 = model_from_json(f.read())
-meta_NN2.model.load_weights(path+'/model/meta_NN2.h5')
-
-with open(path+'/model/meta_weight2.json', 'r') as f :
-    meta_weight2 = model_from_json(f.read())
-meta_weight2.model.load_weights(path+'/model/meta_weight2.h5')
 #------------------------------------------------------------------------------------------------------------------------
 
 
@@ -104,7 +92,7 @@ meta_weight2.model.load_weights(path+'/model/meta_weight2.h5')
 print("\n---------- Inference ----------")
 models = [model1, model2, model3, model4, model5, model6, model7, model8, model9, model10, model11, model12]
 models2 = [meta_xgb, meta_logistic, meta_NN, meta_weight]
-models3 = [meta_NN2, meta_weight2]
+models3 = []
 
 
 # Layer1
@@ -112,6 +100,8 @@ print("\n---------- Layer1 ----------")
 S_test = stacking(models, X_test, include_model)
 y_pred_lst = []
 y_pred_binary_lst =[]
+y_pred_lst2 = []
+y_pred_binary_lst2 =[]
 
 for meta in models2 :
     pred = meta.predict_proba(S_test)[:, 1]
@@ -119,20 +109,8 @@ for meta in models2 :
     y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold))
 
     
-# Layer2
-print("\n---------- Layer2 ----------")
-S_test2 = stacking(models2, S_test, include_model2)
-y_pred_lst2 = []
-y_pred_binary_lst2 =[]
-
-for meta in models3 :
-    pred = meta.predict_proba(S_test2)[:, 1]
-    y_pred_lst2.append(pred)
-    y_pred_binary_lst2.append(pred_to_binary(pred, threshold = threshold))
-
-    
 # Make 'output.csv'
-final, final_df = export_csv(patient_num, error_patient, y_pred_binary_lst2, y_pred_lst2, path = path, index=final_idx)
+final, final_df = export_csv(patient_num, error_patient, y_pred_binary_lst, y_pred_lst, path = path, index=final_idx)
 print("\n")
 print(making_result(S_test, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, include_model, include_model2, include_model3, final))
 

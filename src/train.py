@@ -46,13 +46,13 @@ threshold = "auto"
 norm = 'new'
 include_model = [1,3,4,10,11,12]
 include_model2 = [1,2,3,4]
-include_model3 = [1,2]
+include_model3 = []
 
 
 # Print Information
 name = 'KHW2'
 model = 'ML Stacking'
-summary1 = 'HyperParams tuning with {} ML models + {} stacking model + 1 stacking model(NN)'.format(len(include_model), len(include_model2))
+summary1 = 'HyperParams tuning with {} ML models + 1 stacking model(NN)'.format(len(include_model))
 summary2 = "BETA={} + BETA2={} + cv={} + threshold={} + Norm={}".format(BETA, BETA2, cv, threshold, norm)
 
 print('Author Name :', name)
@@ -61,6 +61,8 @@ print('Summary :', summary1)
 print('Summary2 :', summary2)
 print('Include models for layer1 :', include_model)
 print('Include models for layer2 :', include_model2)
+print('Include models for layer3 :', include_model3)
+
 
 # Data Load
 print("\n---------- Data Load ----------")
@@ -187,27 +189,13 @@ meta_weight = stacking_weight(S_train, y_train)
 
 y_pred_lst = []
 y_pred_binary_lst =[]
+y_pred_lst2 = []
+y_pred_binary_lst2 =[]
 for meta in [meta_xgb, meta_logistic, meta_NN, meta_weight] :
     pred = meta.predict_proba(S_train)[:, 1]
     y_pred_lst.append(pred)
     y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold))
-    
-    
-# Layer2
-print("\n---------- Layer2 ----------")
-models2 = [meta_xgb, meta_logistic, meta_NN, meta_weight]
-S_train2 = stacking(models2, S_train, include_model2)
 
-meta_NN2 = stacking_NN(S_train2, y_train)
-meta_weight2 = stacking_weight(S_train2, y_train)
-
-y_pred_lst2 = []
-y_pred_binary_lst2 =[]
-for meta in [meta_NN2, meta_weight2] :
-    pred = meta.predict_proba(S_train2)[:, 1]
-    y_pred_lst2.append(pred)
-    y_pred_binary_lst2.append(pred_to_binary(pred, threshold = threshold))
-    
     
 # Print result
 print("\n")
@@ -229,18 +217,6 @@ with open(path+'/model/meta_NN.json', 'w') as f :
 meta_weight.model.save_weights(path+'/model/meta_weight.h5')
 with open(path+'/model/meta_weight.json', 'w') as f :
     f.write(meta_weight.model.to_json())
-
-    
-# Save stacking model 2
-print("\n---------- Save Staking Model2 ----------")
-
-meta_NN2.model.save_weights(path+'/model/meta_NN2.h5')
-with open(path+'/model/meta_NN2.json', 'w') as f :
-    f.write(meta_NN2.model.to_json())
-    
-meta_weight2.model.save_weights(path+'/model/meta_weight2.h5')
-with open(path+'/model/meta_weight2.json', 'w') as f :
-    f.write(meta_weight2.model.to_json())
 #------------------------------------------------------------------------------------------------------------------------
 
 print("\n---------- train.py finished ----------")
