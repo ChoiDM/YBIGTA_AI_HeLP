@@ -41,7 +41,7 @@ def feature_extract(image_origin, image_mask, features = ['firstorder', 'glcm', 
     
     cols = []; feats = []
     for feature in features:
-        for featureName in featureVector.keys():
+        for featureName in sorted(featureVector.keys()):
             if feature in featureName:
                 cols.append(featureName)
                 feats.append(featureVector[featureName])

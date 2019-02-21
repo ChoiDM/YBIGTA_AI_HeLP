@@ -28,13 +28,14 @@ target_voxel = (0.65, 0.65, 3)
 
 norm = 'new' # 'norm' should be 'ws' or 'new'
 do_resample = True
+do_shuffle = False  # DO NOT CHANGE!
 
 threshold = 0.70
 class_of_error_patient = 0
 
 
 # Data Load
-X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, features, target_voxel)
+X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, do_shuffle, features, target_voxel)
 
 
 #########################################################################################################################
