@@ -44,7 +44,7 @@ BETA2=0.5
 cv=5
 threshold = "auto"
 norm = 'new'
-include_model = [1,3,4,10,11,12]
+include_model = [1,4,10,11,12]
 include_model2 = [1,2,3,4]
 include_model3 = []
 
