@@ -165,6 +165,5 @@ def test_data_loader(test_dir='/data/test/', norm='new',
                             norm, do_resample, features, target_voxel)
 
     X = np.array(X)
-    print(X)
     
     return X, patient_num, error_patient
