@@ -46,13 +46,11 @@ def export_csv(patient_num, error_patient, y_pred_binary, y_pred, path="/data", 
 def making_result(S, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, Y, models, stacking_models):
     
     if len(stacking_models) == 1 :
-        values = [list(s)+[p0, pb0, pp0, pp1, ppb0, ppb1 ,y] 
-                  for s, p0, pb0, pp0, pp1, ppb0, ppb1,y
+        values = [list(s)+[p0, pb0, pp0, pp1, y] 
+                  for s, p0, pb0, pp0, pp1, y
                   in zip(S, 
                          y_pred_lst[0],
                          y_pred_binary_lst[0],
-                         y_pred_lst2[0], y_pred_lst2[1],
-                         y_pred_binary_lst2[0], y_pred_binary_lst2[1],
                          Y)]
         
         
