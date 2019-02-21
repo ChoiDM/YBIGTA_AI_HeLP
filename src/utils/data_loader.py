@@ -135,14 +135,14 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
             INFARCT_array = mask2binary(INFARCT_array)
             
             # Pre-processing (2)- Normalization
-            if norm == 'new':
+            if norm == 'ws':
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
                 
                 if i % 20 == 0:
                     time = str(datetime.datetime.now()).split()[1].split('.')[0]
                     print(">>> Finished : White-stripe Normalization ({})".format(time))
                 
-            elif norm == 'ws':
+            elif norm == 'new':
                 FLAIR_array = normalization(FLAIR_array, INFARCT_array)
 
                 if i % 20 == 0:
@@ -234,14 +234,14 @@ def test_data_loader(test_dir='/data/test/', norm = 'new', do_resample=True, fea
             INFARCT_array = mask2binary(INFARCT_array)
             
             # Pre-processing (2)- Normalization
-            if norm == 'new':
+            if norm == 'ws':
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
                 
                 if i % 20 == 0:
                     time = str(datetime.datetime.now()).split()[1].split('.')[0]
                     print(">>> Finished : White-stripe Normalization ({})".format(time))
                 
-            elif norm == 'ws':
+            elif norm == 'new':
                 FLAIR_array = normalization(FLAIR_array, INFARCT_array)
 
                 if i % 20 == 0:
