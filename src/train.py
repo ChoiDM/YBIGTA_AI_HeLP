@@ -50,7 +50,7 @@ include_model3 = []
 
 
 # Print Information
-name = 'KHW2'
+name = 'KHW2_1_layer'
 model = 'ML Stacking'
 summary1 = 'HyperParams tuning with {} ML models + 1 stacking model(NN)'.format(len(include_model))
 summary2 = "BETA={} + BETA2={} + cv={} + threshold={} + Norm={}".format(BETA, BETA2, cv, threshold, norm)

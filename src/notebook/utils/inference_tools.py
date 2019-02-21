@@ -53,6 +53,14 @@ def making_result(S, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_l
                          y_pred_binary_lst[0],
                          Y)]
         
+    elif len(stacking_models) == 2 and len(stacking_models2) == 0 :
+        values = [list(s)+[p0, p1, pb0, pb1, y] 
+                  for s, p0, p1, pb0, pb1, y
+                  in zip(S, 
+                         y_pred_lst[0], y_pred_lst[1],
+                         y_pred_binary_lst[0], y_pred_binary_lst[1],
+                         Y)]
+        
     elif len(stacking_models) == 2 and len(stacking_models2) == 1 :
         values = [list(s)+[p0, p1, pb0, pb1, pp0, ppb0,y] 
                   for s, p0, p1, pb0, pb1, pp0, ppb0, y
@@ -73,6 +81,14 @@ def making_result(S, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_l
                          y_pred_binary_lst2[0], y_pred_binary_lst2[1],
                          Y)]
         
+    elif len(stacking_models) == 3 and len(stacking_models2) == 0 :
+        values = [list(s)+[p0, p1, p2, pb0, pb1, pb2 ,y] 
+                  for s, p0, p1, p2, pb0, pb1, pb2, y
+                  in zip(S, 
+                         y_pred_lst[0], y_pred_lst[1], y_pred_lst[2],
+                         y_pred_binary_lst[0], y_pred_binary_lst[1], y_pred_binary_lst[2],
+                         Y)]
+        
     elif len(stacking_models) == 3 and len(stacking_models2) == 1 :
         values = [list(s)+[p0, p1, p2, pb0, pb1, pb2, pp0, ppb0 ,y] 
                   for s, p0, p1, p2, pb0, pb1, pb2, pp0, ppb0, y
@@ -91,6 +107,14 @@ def making_result(S, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_l
                          y_pred_binary_lst[0], y_pred_binary_lst[1], y_pred_binary_lst[2],
                          y_pred_lst2[0], y_pred_lst2[1],
                          y_pred_binary_lst2[0], y_pred_binary_lst2[1],
+                         Y)]
+        
+    elif len(stacking_models) == 4 and len(stacking_models2) == 0 :
+        values = [list(s)+[p0, p1, p2, p3, pb0, pb1, pb2, pb3, y] 
+                  for s, p0, p1, p2, p3, pb0, pb1, pb2, pb3, y
+                  in zip(S, 
+                         y_pred_lst[0], y_pred_lst[1], y_pred_lst[2], y_pred_lst[3],
+                         y_pred_binary_lst[0], y_pred_binary_lst[1], y_pred_binary_lst[2], y_pred_binary_lst[3], 
                          Y)]
         
     elif len(stacking_models) == 4 and len(stacking_models2) == 1 :
