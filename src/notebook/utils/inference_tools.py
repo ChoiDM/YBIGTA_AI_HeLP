@@ -25,8 +25,8 @@ def pred_to_binary(pred_array, threshold = 0.5, per_of_zero=4):
 def export_csv(patient_num, error_patient, y_pred_binary, y_pred, path="/data", index=None, class_of_error_patient=0):
     
     if index != None :
-        y_pred_binary = y_pred_binary[index]
-        y_pred = y_pred[index]
+        y_pred_binary = y_pred_binary[index-1]
+        y_pred = y_pred[index-1]
 
     values = [[num, binary, prob] for num, binary, prob in zip(patient_num, y_pred_binary, y_pred)]
     
@@ -43,20 +43,27 @@ def export_csv(patient_num, error_patient, y_pred_binary, y_pred, path="/data", 
     return y_pred_binary, final_df
 
 
-def making_result(S, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, Y, models, stacking_models):
+def making_result(S, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, models, stacking_models, stacking_models2, Y):
     
     if len(stacking_models) == 1 :
-        values = [list(s)+[p0, pb0, pp0, pp1, ppb0, ppb1 ,y] 
-                  for s, p0, pb0, pp0, pp1, ppb0, ppb1,y
+        values = [list(s)+[p0, pb0, pp0, pp1, y] 
+                  for s, p0, pb0, pp0, pp1, y
                   in zip(S, 
                          y_pred_lst[0],
                          y_pred_binary_lst[0],
-                         y_pred_lst2[0], y_pred_lst2[1],
-                         y_pred_binary_lst2[0], y_pred_binary_lst2[1],
                          Y)]
         
+    elif len(stacking_models) == 2 and len(stacking_models2) == 1 :
+        values = [list(s)+[p0, p1, pb0, pb1, pp0, ppb0,y] 
+                  for s, p0, p1, pb0, pb1, pp0, ppb0, y
+                  in zip(S, 
+                         y_pred_lst[0], y_pred_lst[1],
+                         y_pred_binary_lst[0], y_pred_binary_lst[1],
+                         y_pred_lst2[0],
+                         y_pred_binary_lst2[0],
+                         Y)]
         
-    elif len(stacking_models) == 2 :
+    elif len(stacking_models) == 2 and len(stacking_models2) == 2 :
         values = [list(s)+[p0, p1, pb0, pb1, pp0, pp1, ppb0, ppb1 ,y] 
                   for s, p0, p1, pb0, pb1, pp0, pp1, ppb0, ppb1,y
                   in zip(S, 
@@ -66,7 +73,17 @@ def making_result(S, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_l
                          y_pred_binary_lst2[0], y_pred_binary_lst2[1],
                          Y)]
         
-    elif len(stacking_models) == 3 :
+    elif len(stacking_models) == 3 and len(stacking_models2) == 1 :
+        values = [list(s)+[p0, p1, p2, pb0, pb1, pb2, pp0, ppb0 ,y] 
+                  for s, p0, p1, p2, pb0, pb1, pb2, pp0, ppb0, y
+                  in zip(S, 
+                         y_pred_lst[0], y_pred_lst[1], y_pred_lst[2],
+                         y_pred_binary_lst[0], y_pred_binary_lst[1], y_pred_binary_lst[2],
+                         y_pred_lst2[0],
+                         y_pred_binary_lst2[0],
+                         Y)]
+        
+    elif len(stacking_models) == 3 and len(stacking_models2) == 2 :
         values = [list(s)+[p0, p1, p2, pb0, pb1, pb2, pp0, pp1, ppb0, ppb1 ,y] 
                   for s, p0, p1, p2, pb0, pb1, pb2, pp0, pp1, ppb0, ppb1,y
                   in zip(S, 
@@ -76,7 +93,17 @@ def making_result(S, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_l
                          y_pred_binary_lst2[0], y_pred_binary_lst2[1],
                          Y)]
         
-    elif len(stacking_models) == 4 :
+    elif len(stacking_models) == 4 and len(stacking_models2) == 1 :
+        values = [list(s)+[p0, p1, p2, p3, pb0, pb1, pb2, pb3, pp0, ppb0, y] 
+                  for s, p0, p1, p2, p3, pb0, pb1, pb2, pb3, pp0, ppb0, y
+                  in zip(S, 
+                         y_pred_lst[0], y_pred_lst[1], y_pred_lst[2], y_pred_lst[3],
+                         y_pred_binary_lst[0], y_pred_binary_lst[1], y_pred_binary_lst[2], y_pred_binary_lst[3], 
+                         y_pred_lst2[0],
+                         y_pred_binary_lst2[0],
+                         Y)]
+        
+    elif len(stacking_models) == 4 and len(stacking_models2) == 2 :
         values = [list(s)+[p0, p1, p2, p3, pb0, pb1, pb2, pb3, pp0, pp1, ppb0, ppb1 ,y] 
                   for s, p0, p1, p2, p3, pb0, pb1, pb2, pb3, pp0, pp1, ppb0, ppb1,y
                   in zip(S, 
@@ -89,5 +116,7 @@ def making_result(S, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_l
     final_df = pd.DataFrame(values, columns = ["m_"+str(idx) for idx in models] 
                                                + ["stack_"+str(idx) for idx in stacking_models] 
                                                + ["stack_b_"+str(idx) for idx in stacking_models] 
-                                               + ["NN_2", "weight_2", "NN_b_2", "weight_b_2","y"])
+                                               + ["stack2_"+str(idx) for idx in stacking_models2]
+                                               + ["stack2_b_"+str(idx) for idx in stacking_models2]
+                                               + ["Y"])
     return final_df

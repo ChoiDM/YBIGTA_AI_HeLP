@@ -32,32 +32,43 @@ time = str(datetime.datetime.now()).split()[1].split('.')[0]
 print("---------- Start ----------")
 print("Start:", time, "\n")
 
-
-# Print Information
-name = 'KHW2'
-model = 'ML Stacking'
-summary = 'HyperParams tuning with 6 ML models + 4 stacking model  + 1 stacking model(NN) + BETA=0.75 + cv=5 + threshold=auto + Norm=new'
-
-print('Author Name :', name)
-print('Model :', model)
-print('Summary :', summary)
-
-
-# Setting
 path = "/data"
 pos_dir = path+"/train/positive/"
 neg_dir = path+"/train/negative/"
 
-features = ['firstorder', 'shape']
-target_voxel = (0.65, 0.65, 3)
 
+# Setting
+# Set your params here!!!
+BETA=0.75
+BETA2=0.5
+cv=5
+threshold = "auto"
 norm = 'new'
-do_resample = True
-do_shuffle = True
+include_model = [1,3,4,10,11,12]
+include_model2 = [1,2,3,4]
+include_model3 = [1,2]
 
+
+# Print Information
+name = 'KHW2'
+model = 'ML Stacking'
+summary1 = 'HyperParams tuning with {} ML models + {} stacking model + 1 stacking model(NN)'.format(len(include_model), len(include_model2))
+summary2 = "BETA={} + BETA2={} + cv={} + threshold={} + Norm={}".format(BETA, BETA2, cv, threshold, norm)
+
+print('Author Name :', name)
+print('Model :', model)
+print('Summary :', summary1)
+print('Summary2 :', summary2)
+print('Include models for layer1 :', include_model)
+print('Include models for layer2 :', include_model2)
 
 # Data Load
 print("\n---------- Data Load ----------")
+features = ['firstorder', 'shape']
+target_voxel = (0.65, 0.65, 3)
+do_resample = True
+do_shuffle = True
+
 X_train, y_train = train_data_loader(pos_dir, neg_dir, norm, do_resample, do_shuffle, features, target_voxel)
 
 
@@ -68,27 +79,19 @@ X_train, y_train = train_data_loader(pos_dir, neg_dir, norm, do_resample, do_shu
 #------------------------------------------------------------------------------------------------------------------------
 # Fit ML model with training data
 print("\n---------- Start ML Train ----------")
-cv=5
-BETA=0.75
-BETA2=0.5
-threshold = "auto"
-
-#########
-## scorer
-scorer = make_scorer(fbeta_score, beta=BETA)
 
 #########
 ## model1
 print("model1")
-m1_params = {'subsample': [0.6], 'colsample_bytree': [0.6], 'min_child_weight': [0.5], 'probability': [True], 
+m1_params1 = {'subsample': [0.6], 'colsample_bytree': [0.6], 'min_child_weight': [0.5], 'probability': [True], 
               'gamma': [3.0], 'n_estimators': [300], 'learning_rate': [0.01], 'max_depth': [7]}
-model1 = ml_xgb(X_train, y_train, cv=cv, beta=BETA, params=m1_params)
+model1 = ml_xgb(X_train, y_train, cv=cv, beta=BETA, params=m1_params1)
 
 #########
 ## model2
 print("\nmodel2")
-m2_params = {'probability': [True], 'degree': [2], 'C': [0.001], 'gamma': [0.001]}
-model2 = ml_svm(X_train, y_train, cv=cv, beta=BETA, params=m2_params)
+m2_params1 = {'probability': [True], 'degree': [2], 'C': [0.001], 'gamma': [0.001]}
+model2 = ml_svm(X_train, y_train, cv=cv, beta=BETA, params=m2_params1)
 
 #########
 ## model3
@@ -98,54 +101,54 @@ model3 = ml_logistic(X_train, y_train, cv=cv, beta=BETA)
 #########
 ## model4
 print("\nmodel4")
-m4_params = {'n_estimators': [500], 'min_samples_leaf': [50], 'max_depth': [15]}
-model4 = ml_rf(X_train, y_train, cv=cv, beta=BETA, params=m4_params)
+m4_params1 = {'n_estimators': [500], 'min_samples_leaf': [50], 'max_depth': [15]}
+model4 = ml_rf(X_train, y_train, cv=cv, beta=BETA, params=m4_params1)
 
 #########
 ## model5
 print("\nmodel5")
-m5_params = {'penalty': ['l1'], 'C': [1], 'max_iter': [900]}
-model5 = ml_lasso(X_train, y_train, cv=cv, beta=BETA, params=m5_params)
+m5_params1 = {'penalty': ['l1'], 'C': [1], 'max_iter': [900]}
+model5 = ml_lasso(X_train, y_train, cv=cv, beta=BETA, params=m5_params1)
 
 #########
 ## model6
 print("\nmodel6")
-m6_params =  {'alpha': [10], 'max_iter': [None]}
-model6 = ml_ridge(X_train, y_train, cv=cv, beta=BETA, params=m6_params)
+m6_params1 =  {'alpha': [10], 'max_iter': [None]}
+model6 = ml_ridge(X_train, y_train, cv=cv, beta=BETA, params=m6_params1)
 
 #########
 ## model7
 print("\nmodel7")
-m7_params =  {'penalty': ['elasticnet'], 'loss': ['log'], 'alpha': [100], 'l1_ratio': [0.5], 'max_iter': [1400]}
-model7 = ml_elasticNet(X_train, y_train, cv=cv, beta=BETA, params=m7_params)
+m7_params1 =  {'penalty': ['elasticnet'], 'loss': ['log'], 'alpha': [100], 'l1_ratio': [0.5], 'max_iter': [1400]}
+model7 = ml_elasticNet(X_train, y_train, cv=cv, beta=BETA, params=m7_params1)
 
 #########
 ## model8
 print("\nmodel8")
-m8_params =  {'n_nonzero_coefs': [70]}
-model8 = ml_lars(X_train, y_train, cv=cv, beta=BETA, params=m8_params)
+m8_params1 =  {'n_nonzero_coefs': [70]}
+model8 = ml_lars(X_train, y_train, cv=cv, beta=BETA, params=m8_params1)
 
 #########
 ## model9
 print("\nmodel9")
-m9_params =  {'alpha': [0.1], 'max_iter': [800]}
-model9 = ml_larsLasso(X_train, y_train, cv=cv, beta=BETA, params=m9_params)
+m9_params1 =  {'alpha': [0.1], 'max_iter': [800]}
+model9 = ml_larsLasso(X_train, y_train, cv=cv, beta=BETA, params=m9_params1)
 
 ##########
 ## model10
 print("\nmodel10")
-m10_params =  {'n_estimators': [50], 'max_depth': [3]}
-model10 = ml_extraTrees(X_train, y_train, cv=cv, beta=BETA, params=m10_params)
+m10_params1 =  {'n_estimators': [50], 'max_depth': [3]}
+model10 = ml_extraTrees(X_train, y_train, cv=cv, beta=BETA, params=m10_params1)
 
 ##########
 ## model11
 print("\nmodel11")
-model11 = ml_adaboost(X_train, y_train, cv=cv, beta=BETA)
+model11 = ml_adaboost(X_train, y_train, cv=cv, beta=BETA, params=None)
 
 ##########
-## model10
+## model12
 print("\nmodel12")
-model12 = ml_lightgbm(X_train, y_train, cv=cv, beta=BETA)
+model12 = ml_lightgbm(X_train, y_train, cv=cv, beta=BETA, params=None)
 #------------------------------------------------------------------------------------------------------------------------
 
 
@@ -175,14 +178,12 @@ print("\n---------- Start Staking Train ----------")
 # Layer1
 print("\n---------- Layer1 ----------")
 models = [model1, model2, model3, model4, model5, model6, model7, model8, model9, model10, model11, model12]
-include_model = [1,3,4,10,11,12]
-
 S_train = stacking(models, X_train, include_model)
 
 meta_xgb = stacking_xgb(S_train, y_train, cv=cv, beta=BETA2)
 meta_logistic = stacking_logistic(S_train, y_train, cv=cv, beta=BETA2)
-meta_NN = stacking_NN(S_train, y_train, cv=cv)
-meta_weight = stacking_weight(S_train, y_train, cv=cv)
+meta_NN = stacking_NN(S_train, y_train)
+meta_weight = stacking_weight(S_train, y_train)
 
 y_pred_lst = []
 y_pred_binary_lst =[]
@@ -195,12 +196,10 @@ for meta in [meta_xgb, meta_logistic, meta_NN, meta_weight] :
 # Layer2
 print("\n---------- Layer2 ----------")
 models2 = [meta_xgb, meta_logistic, meta_NN, meta_weight]
-include_model2 = [1,2,3,4]
-
 S_train2 = stacking(models2, S_train, include_model2)
 
-meta_NN2 = stacking_NN(S_train2, y_train, cv=cv)
-meta_weight2 = stacking_weight(S_train2, y_train, cv=cv)
+meta_NN2 = stacking_NN(S_train2, y_train)
+meta_weight2 = stacking_weight(S_train2, y_train)
 
 y_pred_lst2 = []
 y_pred_binary_lst2 =[]
@@ -212,7 +211,7 @@ for meta in [meta_NN2, meta_weight2] :
     
 # Print result
 print("\n")
-print(making_result(S_train, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, y_train, include_model, include_model2))
+print(making_result(S_train, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, include_model, include_model2, include_model3, y_train))
 #------------------------------------------------------------------------------------------------------------------------
 
 

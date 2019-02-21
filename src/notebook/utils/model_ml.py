@@ -171,17 +171,6 @@ def ml_elasticNet(X_train, y_train, cv=5, beta=0.75, params = None) :
     return best_model
 
 def ml_lars(X_train, y_train, cv=5, beta=0.75, params = None) :
-    def new_scorer(y_true, y_pred, threshold=0.5, beta=beta) :
-        result = []
-
-        for pred in list(y_pred) :
-            if pred >= threshold :
-                result.append(1)
-            else :
-                result.append(0)
-
-        return fbeta_score(y_true, np.array(result), beta=beta)
-
     model = Lars()
     
     if not params :
@@ -195,14 +184,14 @@ def ml_lars(X_train, y_train, cv=5, beta=0.75, params = None) :
     best_grid = ""
 
     for t in [0, 0.05, 0.1, 0.2, 0.25, 0.3, 0.45, 0.4, 0.45, 0.5, 0.6] :
-        scorer = make_scorer(new_scorer, threshold=t)
+        scorer = make_scorer(new_scorer, threshold=t, beta=beta)
         model_grid = GridSearchCV(model, param_grid=params, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
         model_grid.fit(X_train, y_train)
 
         if max_score < model_grid.best_score_ :
             best_model = model_grid.best_estimator_
             best_t = t
-            best_grid = m8_grid_1
+            best_grid = model_grid
 
     model_grid = best_grid
     best_model = best_grid.best_estimator_
@@ -211,18 +200,9 @@ def ml_lars(X_train, y_train, cv=5, beta=0.75, params = None) :
     print("Threshold :", best_t)
     print("Best Params : {}".format(model_grid.best_params_))
     
+    
+    
 def ml_larsLasso(X_train, y_train, cv=5, beta=0.75, params = None) :
-    def new_scorer(y_true, y_pred, threshold=0.5, beta=beta) :
-        result = []
-
-        for pred in list(y_pred) :
-            if pred >= threshold :
-                result.append(1)
-            else :
-                result.append(0)
-
-        return fbeta_score(y_true, np.array(result), beta=beta)
-
     model = LassoLars()
     
     if not params :
@@ -237,14 +217,14 @@ def ml_larsLasso(X_train, y_train, cv=5, beta=0.75, params = None) :
     best_grid = ""
 
     for t in [0, 0.05, 0.1, 0.2, 0.25, 0.3, 0.45, 0.4, 0.45, 0.5, 0.6] :
-        scorer = make_scorer(new_scorer, threshold=t)
+        scorer = make_scorer(new_scorer, threshold=t, beta=beta)
         model_grid = GridSearchCV(model, param_grid=params, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
         model_grid.fit(X_train, y_train)
 
         if max_score < model_grid.best_score_ :
             best_model = model_grid.best_estimator_
             best_t = t
-            best_grid = m8_grid_1
+            best_grid = model_grid
 
     model_grid = best_grid
     best_model = best_grid.best_estimator_
@@ -300,11 +280,9 @@ def ml_lightgbm(X_train, y_train, cv=5, beta=0.75, params = None) :
     
     if not params :
         params = {
-            'max_depth' : [-1,5,7,9],
             'min_child_weight' : [0.5, 1, 2, 5],
             'colsample_bytree' : [0.6, 0.8, 1.0],
             'subsample' : [0.6, 0.8, 1.0],
-            'probability' : [True],
             'learning_rate' : [0.05, 0.1],
             'n_estimators' : [100, 300],
             'reg_alpha' : [0.0, 1.0, 2.0, 5.0], 
@@ -321,3 +299,13 @@ def ml_lightgbm(X_train, y_train, cv=5, beta=0.75, params = None) :
     
     return best_model
 
+def new_scorer(y_true, y_pred, threshold=0.5, beta=0.75) :
+        result = []
+
+        for pred in list(y_pred) :
+            if pred >= threshold :
+                result.append(1)
+            else :
+                result.append(0)
+
+        return fbeta_score(y_true, np.array(result), beta=beta)

@@ -25,20 +25,26 @@ warnings.filterwarnings('ignore')
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 
-
-# Setting
 path = "/data"
 test_dir = path+'/test/'
 
-features = ['firstorder', 'shape']
-target_voxel = (0.65, 0.65, 3)
 
+# Setting
+# Set your params here!!!
+threshold = "auto"
 norm = 'new'
-do_resample = True
+include_model = [1,3,4,10,11,12]
+include_model2 = [1,2,3,4]
+include_model3 = [1,2]
+final_idx = 1
 
 
 # Data Load
 print("\n---------- Data Load ----------")
+features = ['firstorder', 'shape']
+target_voxel = (0.65, 0.65, 3)
+do_resample = True
+
 X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, features, target_voxel)
 
 
@@ -95,17 +101,10 @@ meta_weight2.model.load_weights(path+'/model/meta_weight2.h5')
 
 #------------------------------------------------------------------------------------------------------------------------
 # Stacking model
-print("\n---------- Model Stacking ----------")
-
+print("\n---------- Inference ----------")
 models = [model1, model2, model3, model4, model5, model6, model7, model8, model9, model10, model11, model12]
 models2 = [meta_xgb, meta_logistic, meta_NN, meta_weight]
 models3 = [meta_NN2, meta_weight2]
-include_model = [1,3,4,10,11,12]
-include_model2 = [1,2,3,4]
-
-threshold = "auto"
-print("\n---------- Inference ----------")
-print("Threshold :", threshold)
 
 
 # Layer1
@@ -126,17 +125,19 @@ S_test2 = stacking(models2, S_test, include_model2)
 y_pred_lst2 = []
 y_pred_binary_lst2 =[]
 
-
 for meta in models3 :
     pred = meta.predict_proba(S_test2)[:, 1]
     y_pred_lst2.append(pred)
     y_pred_binary_lst2.append(pred_to_binary(pred, threshold = threshold))
 
+    
 # Make 'output.csv'
-final, final_df = export_csv(patient_num, error_patient, y_pred_binary_lst2, y_pred_lst2, path = path, index=0)
-print(making_result(S_test, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, final, include_model, include_model2))
+final, final_df = export_csv(patient_num, error_patient, y_pred_binary_lst2, y_pred_lst2, path = path, index=final_idx)
+print("\n")
+print(making_result(S_test, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, include_model, include_model2, include_model3, final))
 
-print("\n\n\n----------------------------")
+print("\n\n\n")
+print("----------------------------")
 print("---------- Result ----------")
 print("----------------------------")
 print(final_df)
