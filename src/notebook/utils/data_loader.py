@@ -86,7 +86,13 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
             # Feature Extraction by Radiomics
             ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array, features)
             FLAIR_values, FLAIR_columns = feature_extract(FLAIR_array, INFARCT_array, features)
-
+            
+            # Sort columns
+            ADC = sorted([(v, c) for v,c in zip(ADC_values, ADC_columns)], key = lambda x : x[1])
+            FLAIR = sorted([(v, c) for v,c in zip(FLAIR_values, FLAIR_columns)], key = lambda x : x[1])
+            ADC_values = [x[0] for x in ADC]
+            FLAIR_values = [x[0] for x in FLAIR]
+     
             total_values = ADC_values + FLAIR_values
             # total_columns = ['ADC_' + col for col in ADC_columns] + ['FLAIR_' + col for col in ADC_columns]
 
@@ -156,6 +162,12 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
             # Feature Extraction by Radiomics
             ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array, features)
             FLAIR_values, FLAIR_columns = feature_extract(FLAIR_array, INFARCT_array, features)
+            
+            # Sort columns
+            ADC = sorted([(v, c) for v,c in zip(ADC_values, ADC_columns)], key = lambda x : x[1])
+            FLAIR = sorted([(v, c) for v,c in zip(FLAIR_values, FLAIR_columns)], key = lambda x : x[1])
+            ADC_values = [x[0] for x in ADC]
+            FLAIR_values = [x[0] for x in FLAIR]
 
             total_values = ADC_values + FLAIR_values
             # total_columns = ['ADC_' + col for col in ADC_columns] + ['FLAIR_' + col for col in ADC_columns]
@@ -255,6 +267,12 @@ def test_data_loader(test_dir='/data/test/', norm = 'new', do_resample=True, fea
             # Feature Extraction by Radiomics
             ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array, features)
             FLAIR_values, FLAIR_columns = feature_extract(FLAIR_array, INFARCT_array, features)
+            
+            # Sort columns
+            ADC = sorted([(v, c) for v,c in zip(ADC_values, ADC_columns)], key = lambda x : x[1])
+            FLAIR = sorted([(v, c) for v,c in zip(FLAIR_values, FLAIR_columns)], key = lambda x : x[1])
+            ADC_values = [x[0] for x in ADC]
+            FLAIR_values = [x[0] for x in FLAIR]
 
             total_values = ADC_values + FLAIR_values
             # total_columns = ['ADC_' + col for col in ADC_columns] + ['FLAIR_' + col for col in ADC_columns]
