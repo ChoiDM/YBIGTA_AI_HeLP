@@ -30,9 +30,9 @@ def stacking(models, data, include, predict_binary=[None]) :
     return np.array(result).T
 
 
-def stacking_xgb(S_train, y_train, stacking_params=None, cv=5) :
+def stacking_xgb(S_train, y_train, stacking_params=None, cv=5, beta=0.5) :
     stacking_model = XGBClassifier()
-    scorer = make_scorer(fbeta_score, beta=0.5)
+    scorer = make_scorer(fbeta_score, beta=beta)
     
     if not stacking_params :
         stacking_params = {
@@ -56,9 +56,9 @@ def stacking_xgb(S_train, y_train, stacking_params=None, cv=5) :
     return meta_model
     
     
-def stacking_logistic(S_train, y_train, stacking_params=None, cv=5) :
+def stacking_logistic(S_train, y_train, stacking_params=None, cv=5, beta=0.5) :
     stacking_model = LogisticRegression()
-    scorer = make_scorer(fbeta_score, beta=0.5)
+    scorer = make_scorer(fbeta_score, beta=beta)
     
     if not stacking_params :
         stacking_params =  {

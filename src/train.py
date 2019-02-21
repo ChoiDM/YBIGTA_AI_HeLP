@@ -34,9 +34,9 @@ print("Start:", time, "\n")
 
 
 # Print Information
-name = 'KHW'
+name = 'KHW2'
 model = 'ML Stacking'
-summary = 'HyperParams tuning with 6 ML models + 4 stacking model  + 1 stacking model(NN) + BETA=0.75 + cv=5 + threshold=auto'
+summary = 'HyperParams tuning with 6 ML models + 4 stacking model  + 1 stacking model(NN) + BETA=0.75 + cv=5 + threshold=auto + Norm=new'
 
 print('Author Name :', name)
 print('Model :', model)
@@ -51,15 +51,14 @@ neg_dir = path+"/train/negative/"
 features = ['firstorder', 'shape']
 target_voxel = (0.65, 0.65, 3)
 
-do_n4 = False
-do_ws = True
+norm = 'new'
 do_resample = True
 do_shuffle = True
 
 
 # Data Load
 print("\n---------- Data Load ----------")
-X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample, do_shuffle, features, target_voxel)
+X_train, y_train = train_data_loader(pos_dir, neg_dir, norm, do_resample, do_shuffle, features, target_voxel)
 
 
 ####################################################################z#####################################################
@@ -71,6 +70,7 @@ X_train, y_train = train_data_loader(pos_dir, neg_dir, do_n4, do_ws, do_resample
 print("\n---------- Start ML Train ----------")
 cv=5
 BETA=0.75
+BETA2=0.5
 threshold = "auto"
 
 #########
@@ -176,10 +176,11 @@ print("\n---------- Start Staking Train ----------")
 print("\n---------- Layer1 ----------")
 models = [model1, model2, model3, model4, model5, model6, model7, model8, model9, model10, model11, model12]
 include_model = [1,3,4,10,11,12]
+
 S_train = stacking(models, X_train, include_model)
 
-meta_xgb = stacking_xgb(S_train, y_train, cv=cv)
-meta_logistic = stacking_logistic(S_train, y_train, cv=cv)
+meta_xgb = stacking_xgb(S_train, y_train, cv=cv, beta=BETA2)
+meta_logistic = stacking_logistic(S_train, y_train, cv=cv, beta=BETA2)
 meta_NN = stacking_NN(S_train, y_train, cv=cv)
 meta_weight = stacking_weight(S_train, y_train, cv=cv)
 
@@ -195,6 +196,7 @@ for meta in [meta_xgb, meta_logistic, meta_NN, meta_weight] :
 print("\n---------- Layer2 ----------")
 models2 = [meta_xgb, meta_logistic, meta_NN, meta_weight]
 include_model2 = [1,2,3,4]
+
 S_train2 = stacking(models2, S_train, include_model2)
 
 meta_NN2 = stacking_NN(S_train2, y_train, cv=cv)

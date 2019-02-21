@@ -33,14 +33,13 @@ test_dir = path+'/test/'
 features = ['firstorder', 'shape']
 target_voxel = (0.65, 0.65, 3)
 
-do_n4 = False
-do_ws = True
+norm = 'new'
 do_resample = True
 
 
 # Data Load
 print("\n---------- Data Load ----------")
-X_test, patient_num, error_patient = test_data_loader(test_dir, do_n4, do_ws, do_resample, features, target_voxel)
+X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, features, target_voxel)
 
 
 #########################################################################################################################

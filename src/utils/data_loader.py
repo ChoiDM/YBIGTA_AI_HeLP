@@ -10,10 +10,11 @@ from utils.N4Correction import n4correction
 from utils.Resample import resample, mask2binary
 from utils.WhiteStripeNormalization import ws_normalize
 from utils.FeatureExtract import feature_extract
+from utils.Normalization import normalization
 
 
 # Feature Extraction for Train
-def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/negative/', do_n4=True, do_ws=True,
+def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/negative/', norm='new',
                       do_resample=True, do_shuffle=True,
                       features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3)):
     # File List
@@ -30,7 +31,9 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
 
     for i, pos_patient in enumerate(pos_patient_list):
         time = str(datetime.datetime.now()).split()[1].split('.')[0]
-        print("Processing [{0}/{1}] Image of Positive Patient... ({2})".format(i + 1, len(pos_patient_list), time))
+        
+        if i % 20 == 0:
+            print("Processing [{0}/{1}] Image of Positive Patient... ({2})".format(i + 1, len(pos_patient_list), time))
 
         ADC_path, FLAIR_path, b1000_path, BRAIN_path, INFARCT_path = sorted(
             [path for path in pos_file_list if pos_patient in path])
@@ -53,30 +56,32 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
                 BRAIN_array = resample(BRAIN_array, origin_voxel_size, target_voxel)
                 INFARCT_array = resample(INFARCT_array, origin_voxel_size, target_voxel)
 
-                time = str(datetime.datetime.now()).split()[1].split('.')[0]
-                print(">>> Finished : Voxel Size Resampling ({})".format(time))
+                if i % 20 == 0:
+                    time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                    print(">>> Finished : Voxel Size Resampling ({})".format(time))
 
             # Make Mask to Binary (0 or 1)
             BRAIN_array = mask2binary(BRAIN_array)
             INFARCT_array = mask2binary(INFARCT_array)
-            print(">>> Unique Value of BRAIN mask :", np.unique(BRAIN_array))
-            print(">>> Unique Value of INFARCT mask :", np.unique(INFARCT_array))
-
-            # Pre-processing (2)- N4 Bias Correction
-            if do_n4:
-                ADC_array = n4correction(ADC_array)
-                FLAIR_array = n4correction(FLAIR_array)
-
-                time = str(datetime.datetime.now()).split()[1].split('.')[0]
-                print(">>> Finished : N4 Bias Correction ({})".format(time))
-
-            # Pre-processing (3)- White-stripe Normalization
-            if do_ws:
-                # ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
+            # Pre-processing (2)- Normalization
+            if norm == 'new':
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
+                
+                if i % 20 == 0:
+                    time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                    print(">>> Finished : White-stripe Normalization ({})".format(time))
+                
+            elif norm == 'ws':
+                FLAIR_array = normalization(FLAIR_array, INFARCT_array)
 
-                time = str(datetime.datetime.now()).split()[1].split('.')[0]
-                print(">>> Finished : White-stripe Normalization ({})".format(time))
+                if i % 20 == 0:
+                    time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                    print(">>> Finished : New Normalization ({})".format(time))
+                
+            else:
+                print("Value of 'norm' parameter should be 'new' of 'ws'")
+                raise ValueError
+
 
             # Feature Extraction by Radiomics
             ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array, features)
@@ -92,12 +97,13 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
 
         except Exception as ex:
             time = str(datetime.datetime.now()).split()[1].split('.')[0]
-            print("Error !!! [Patient Number : {}] ({})".format(i + 1, time))
+            print("\n!!! Error [Patient Number : {}] ({})".format(i + 1, time))
             print(ex)
 
     for i, neg_patient in enumerate(neg_patient_list):
-        time = str(datetime.datetime.now()).split()[1].split('.')[0]
-        print("Processing [{0}/{1}] Image of Negative Patient... ({2})".format(i + 1, len(neg_patient_list), time))
+        if i % 20 == 0:
+            time = str(datetime.datetime.now()).split()[1].split('.')[0]
+            print("Processing [{0}/{1}] Image of Negative Patient... ({2})".format(i + 1, len(neg_patient_list), time))
 
         ADC_path, FLAIR_path, b1000_path, BRAIN_path, INFARCT_path = sorted(
             [path for path in neg_file_list if neg_patient in path])
@@ -120,30 +126,32 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
                 BRAIN_array = resample(BRAIN_array, origin_voxel_size, target_voxel)
                 INFARCT_array = resample(INFARCT_array, origin_voxel_size, target_voxel)
 
-                time = str(datetime.datetime.now()).split()[1].split('.')[0]
-                print(">>> Finished : Voxel Size Resampling ({})".format(time))
+                if i % 20 == 0:
+                    time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                    print(">>> Finished : Voxel Size Resampling ({})".format(time))
 
             # Make Mask to Binary (0 or 1)
             BRAIN_array = mask2binary(BRAIN_array)
             INFARCT_array = mask2binary(INFARCT_array)
-            print(">>> Unique Value of BRAIN mask :", np.unique(BRAIN_array))
-            print(">>> Unique Value of INFARCT mask :", np.unique(INFARCT_array))
-
-            # Pre-processing (2)- N4 Bias Correction
-            if do_n4:
-                ADC_array = n4correction(ADC_array)
-                FLAIR_array = n4correction(FLAIR_array)
-
-                time = str(datetime.datetime.now()).split()[1].split('.')[0]
-                print(">>> Finished : N4 Bias Correction ({})".format(time))
-
-            # Pre-processing (3)- White-stripe Normalization
-            if do_ws:
-                # ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
+            
+            # Pre-processing (2)- Normalization
+            if norm == 'new':
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
+                
+                if i % 20 == 0:
+                    time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                    print(">>> Finished : White-stripe Normalization ({})".format(time))
+                
+            elif norm == 'ws':
+                FLAIR_array = normalization(FLAIR_array, INFARCT_array)
 
-                time = time = str(datetime.datetime.now()).split()[1].split('.')[0]
-                print(">>> Finished : White-stripe Normalization ({})".format(time))
+                if i % 20 == 0:
+                    time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                    print(">>> Finished : New Normalization ({})".format(time))
+                
+            else:
+                print("Value of 'norm' parameter should be 'new' of 'ws'")
+                raise ValueError
 
             # Feature Extraction by Radiomics
             ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array, features)
@@ -159,7 +167,7 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
 
         except Exception as ex:
             time = str(datetime.datetime.now()).split()[1].split('.')[0]
-            print("Error !!! [Patient Number : {}] ({})".format(i + 1, time))
+            print("\n!!! Error [Patient Number : {}] ({})".format(i + 1, time))
             print(ex)
 
     if do_shuffle:
@@ -180,7 +188,7 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
 
 
 # Feature Extraction for Inference
-def test_data_loader(test_dir='/data/test/', do_n4=True, do_ws=True, do_resample=True, features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3)):
+def test_data_loader(test_dir='/data/test/', norm = 'new', do_resample=True, features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3)):
     # File List
     test_file_list = glob(test_dir + "*")
     test_patient_list = list(set([path.split('_')[0] for path in os.listdir(test_dir)]))
@@ -193,8 +201,9 @@ def test_data_loader(test_dir='/data/test/', do_n4=True, do_ws=True, do_resample
     for i, test_patient in enumerate(test_patient_list):
 
         try:
-            time = str(datetime.datetime.now()).split()[1].split('.')[0]
-            print("Processing [{0}/{1}] Image of Test Patient... ({2})".format(i + 1, len(test_patient_list), time))
+            if i % 20 == 0:
+                time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                print("Processing [{0}/{1}] Image of Test Patient... ({2})".format(i + 1, len(test_patient_list), time))
 
             ADC_path, FLAIR_path, b1000_path, BRAIN_path, INFARCT_path = sorted(
                 [path for path in test_file_list if test_patient in path])
@@ -216,30 +225,32 @@ def test_data_loader(test_dir='/data/test/', do_n4=True, do_ws=True, do_resample
                 BRAIN_array = resample(BRAIN_array, origin_voxel_size, target_voxel)
                 INFARCT_array = resample(INFARCT_array, origin_voxel_size, target_voxel)
 
-                time = str(datetime.datetime.now()).split()[1].split('.')[0]
-                print(">>> Finished : Voxel Size Resampling ({})".format(time))
+                if i % 20 == 0:
+                    time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                    print(">>> Finished : Voxel Size Resampling ({})".format(time))
 
             # Make Mask to Binary (0 or 1)
             BRAIN_array = mask2binary(BRAIN_array)
             INFARCT_array = mask2binary(INFARCT_array)
-            print(">>> Unique Value of BRAIN mask :", np.unique(BRAIN_array))
-            print(">>>Unique Value of INFARCT mask :", np.unique(INFARCT_array))
-
-            # Pre-processing (2)- N4 Bias Correction
-            if do_n4:
-                ADC_array = n4correction(ADC_array)
-                FLAIR_array = n4correction(FLAIR_array)
-
-                time = str(datetime.datetime.now()).split()[1].split('.')[0]
-                print(">>> Finished : N4 Bias Correction ({})".format(time))
-
-            # Pre-processing (3)- White-stripe Normalization
-            if do_ws:
-                # ADC_array = ws_normalize(ADC_array, 'T2', BRAIN_array)
+            
+            # Pre-processing (2)- Normalization
+            if norm == 'new':
                 FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
+                
+                if i % 20 == 0:
+                    time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                    print(">>> Finished : White-stripe Normalization ({})".format(time))
+                
+            elif norm == 'ws':
+                FLAIR_array = normalization(FLAIR_array, INFARCT_array)
 
-                time = str(datetime.datetime.now()).split()[1].split('.')[0]
-                print(">>> Finished : White-stripe Normalization ({})".format(time))
+                if i % 20 == 0:
+                    time = str(datetime.datetime.now()).split()[1].split('.')[0]
+                    print(">>> Finished : New Normalization ({})".format(time))
+                
+            else:
+                print("Value of 'norm' parameter should be 'new' of 'ws'")
+                raise ValueError
 
             # Feature Extraction by Radiomics
             ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array, features)
@@ -252,7 +263,7 @@ def test_data_loader(test_dir='/data/test/', do_n4=True, do_ws=True, do_resample
             patient_num.append(test_patient)
 
         except Exception as e:
-            print("!! Error in", test_patient)
+            print("\n!!! Error [Patient Number : {}]".format(i + 1))
             print(e)
 
             error_patient.append(test_patient)
