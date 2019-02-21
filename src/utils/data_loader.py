@@ -67,10 +67,10 @@ def process_patient(i, patient, file_list, norm, do_resample, features, target_v
         FLAIR_values, FLAIR_columns = feature_extract(FLAIR_array, INFARCT_array, features)
 
         # Sort columns
-#        ADC = sorted([(v, c) for v,c in zip(ADC_values, ADC_columns)], key = lambda x : x[1])
-#        FLAIR = sorted([(v, c) for v,c in zip(FLAIR_values, FLAIR_columns)], key = lambda x : x[1])
-#        ADC_values = [x[0] for x in ADC]
-#        FLAIR_values = [x[0] for x in FLAIR]
+        ADC = sorted([(v, c) for v,c in zip(ADC_values, ADC_columns)], key = lambda x : x[1])
+        FLAIR = sorted([(v, c) for v,c in zip(FLAIR_values, FLAIR_columns)], key = lambda x : x[1])
+        ADC_values = [x[0] for x in ADC]
+        FLAIR_values = [x[0] for x in FLAIR]
 
         total_values = ADC_values + FLAIR_values
         # total_columns = ['ADC_' + col for col in ADC_columns] + ['FLAIR_' + col for col in ADC_columns]
