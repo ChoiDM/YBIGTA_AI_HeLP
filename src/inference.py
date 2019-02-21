@@ -33,7 +33,7 @@ test_dir = path+'/test/'
 # Set your params here!!!
 threshold = "auto"
 norm = 'new'
-include_model = [1,3,4,10,11,12]
+include_model = [1,4,10,11,12]
 include_model2 = [1,2,3,4]
 include_model3 = []
 final_idx = 3
