@@ -74,7 +74,7 @@ def process_patient(i, patient, file_list, norm, do_resample, features, target_v
 
         total_values = ADC_values + FLAIR_values
         # total_columns = ['ADC_' + col for col in ADC_columns] + ['FLAIR_' + col for col in ADC_columns]
-        return total_values
+        return (total_values, i, patient)
 
     except Exception as ex:
         ex.args = (*[a for a in ex.args], i, patient)
@@ -94,14 +94,15 @@ def process_patient_wrapper(X, y, patient_num, error_patient, patient_list, file
             futures.append(executor.submit(process_patient, i, patient, file_list, norm, do_resample, features, target_voxel))
 
     output = [future.result() for future in futures]
-    for total_values in output:
+    for out in output:
         time = str(datetime.datetime.now()).split()[1].split('.')[0]
-        if isinstance(total_values, Exception):
-            msg, i, patient = total_values.args
+        if isinstance(out, Exception):
+            msg, i, patient = out.args
             print("Error !!! [Patient Number : {}] ({})".format(i + 1, time))
             error_patient.append(patient)
             print(msg)
         else:
+            total_values, i, patient = out
             X.append(total_values)
             if patient_type in ["Positive", "Negative"]:
                 y.append(target)
