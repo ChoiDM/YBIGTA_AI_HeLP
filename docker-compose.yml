@@ -1,0 +1,9 @@
+version: '3'
+services:
+  aihelp:
+    build:
+      context: .
+    container_name: ai_help
+    volumes:
+      - ./sample_stroke:/data/train
+    command: bash ./train.sh
