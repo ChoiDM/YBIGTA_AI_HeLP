@@ -1,16 +1,17 @@
-from utils.data_loader import test_data_loader
+from utils.cube_data_loader import test_data_loader
 from utils.inference_tools import pred_to_binary, export_csv
 import pandas as pd
-import xgboost as xgb
 import pickle
+from keras.models import load_model
+import numpy as np
 
 import warnings
 warnings.filterwarnings('ignore')
 
 
 # Print Information
-name = 'master-branch'
-model = 'XGBoost'
+name = 'taeoh_base'
+model = 'CNN_base'
 summary = 'Normalization with new method / Threshold to 0.70'
 
 print('---------------------------')
@@ -29,26 +30,27 @@ target_voxel = (0.65, 0.65, 3)
 norm = 'new' # 'norm' should be 'ws' or 'new'
 do_resample = True
 do_shuffle = False  # DO NOT CHANGE!
+brain_mask=True
 
 threshold = 0.70
 class_of_error_patient = 0
 
 
 # Data Load
-X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, do_shuffle, features, target_voxel)
+X_ADC, X_FLAIR, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, do_shuffle, features, target_voxel, brain_mask)
 
-
+X_test = np.hstack([X_ADC, X_FLAIR])
 #########################################################################################################################
 #########################################################################################################################
 #### Modify here ####
 
 
 # Load trained model
-xgbClassifier = pickle.load(open('/data/model/xgb.pickle.dat', 'rb'))
-
+model = load_model('data/model/model.h5')
 
 # Make Predictions for Test Data
-y_pred = xgbClassifier.predict_proba(X_test)[:, 1]
+# y_pred = model.predict_proba(X_test)[:, 1]
+y_pred = model.predict_proba(X_test)
 y_pred_binary = pred_to_binary(y_pred, threshold = threshold)
 
 

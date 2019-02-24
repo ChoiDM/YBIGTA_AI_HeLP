@@ -3,8 +3,9 @@ from sklearn.metrics import fbeta_score, make_scorer
 import xgboost as xgb
 import pickle
 import datetime
-import keras
 import numpy as np
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Activation, Flatten, Conv2D, pooling
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -52,6 +53,28 @@ X_ADC, X_FLAIR, y_train = train_data_loader(pos_dir, neg_dir, norm, do_resample,
 X_train = np.hstack([X_ADC, X_FLAIR])
 print(X_train.shape)
 
+model = Sequential()
+model.add(Conv2D(32, 3, 3, activation='relu', input_shape=(128,64, 10)))
+print(model.output_shape)
+
+model.add(Conv2D(32, 3, 3, activation='relu'))
+model.add(pooling.MaxPooling2D(pool_size=(2,2)))
+model.add(Dropout(0.25))
+
+model.add(Flatten())
+model.add(Dense(128, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(10, activation='relu'))
+model.add(Dense(1, activation='softmax'))
+
+
+model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+              
+model.fit(X_train, y_train, batch_size=10, nb_epoch=10, verbose=1)
+
+score = model.evaluate(X_train, y_train, verbose=0)
+print(model.metrics_names)
+print(score)
 # Fit Model with Training Data
 # xgbClassifier = xgb.XGBClassifier(subsample=1.0, gamma=2, colsample_bytree=0.8, max_depth=6, min_child_weight=10)
 # xgbClassifier.fit(X_train, y_train)
@@ -62,4 +85,6 @@ print(X_train.shape)
 
 
 # Save model to file
-pickle.dump(xgbClassifier, open('/data/model/xgb.pickle.dat', 'wb'))
+# pickle.dump(xgbClassifier, open('/data/model/xgb.pickle.dat', 'wb'))
+model.save("/data/model/model.h5")
+print("Saved model to disk")

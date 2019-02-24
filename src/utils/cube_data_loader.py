@@ -126,7 +126,7 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
                             norm, do_resample, features, target_voxel, brain_mask)
 
     process_patient_wrapper(X_ADC, X_FLAIR, y, patient_num, error_patient, neg_patient_list, neg_file_list, "Negative",
-                            norm, do_resample, features, target_voxel)
+                            norm, do_resample, features, target_voxel, brain_mask)
 
     if do_shuffle:
         shuffle_list = [[X1_value, X2_value, y_value, num] for X1_value, X2_value, y_value, num in zip(X_ADC,X_FLAIR, y, patient_num)]
