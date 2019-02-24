@@ -34,7 +34,7 @@ target_voxel = (0.65, 0.65, 3)
 norm = 'new' # 'norm' should be 'ws' or 'new'
 do_resample = True
 
-do_shuffle = True
+do_shuffle = False
 
 
 #########################################################################################################################
