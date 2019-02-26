@@ -4,11 +4,11 @@ pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 
 
-def pred_to_binary(pred_array, threshold = 0.5, per_of_zero=4):
+def pred_to_binary(pred_array, threshold = 0.5, per_of_zero=45):
     
     if threshold == "auto" :
         pred_binary = sorted(list(pred_array))
-        threshold = pred_binary[int(len(pred_binary)*per_of_zero/10)]
+        threshold = pred_binary[int(len(pred_binary)*per_of_zero/100)]
         
         pred_binary = np.copy(pred_array)
         pred_binary[pred_binary > threshold] = 1
