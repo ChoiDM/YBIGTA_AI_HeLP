@@ -44,9 +44,8 @@ print("\n---------- Data Load ----------")
 features = ['firstorder', 'shape']
 target_voxel = (0.65, 0.65, 3)
 do_resample = True
-do_shuffle = False
 
-X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, do_shuffle, features, target_voxel)
+X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, features, target_voxel)
 
 
 #########################################################################################################################
