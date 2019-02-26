@@ -15,7 +15,8 @@ from concurrent.futures import ProcessPoolExecutor
 
 
 def process_patient(i, patient, file_list, norm, do_resample, features, target_voxel):
-    ADC_path, FLAIR_path, b1000_path, BRAIN_path, INFARCT_path = sorted([path for path in file_list if patient in path])
+    ADC_path, FLAIR_path, b1000_path, BRAIN_path, INFARCT_path = \
+        sorted([path for path in file_list if patient in path])
 
     try:
         # Data Preparing
@@ -28,6 +29,7 @@ def process_patient(i, patient, file_list, norm, do_resample, features, target_v
 
         origin_voxel_size = INFARCT_nii.header.get_zooms()
 
+
         # Pre-processing (1) - Resampling Voxel Size
         if do_resample:
             ADC_array = resample(ADC_array, origin_voxel_size, target_voxel)
@@ -35,9 +37,11 @@ def process_patient(i, patient, file_list, norm, do_resample, features, target_v
             BRAIN_array = resample(BRAIN_array, origin_voxel_size, target_voxel)
             INFARCT_array = resample(INFARCT_array, origin_voxel_size, target_voxel)
 
+
         # Make Mask to Binary (0 or 1)
         BRAIN_array = mask2binary(BRAIN_array)
         INFARCT_array = mask2binary(INFARCT_array)
+
 
         # Pre-processing (2) - Normalization
         if norm == 'ws':
@@ -47,12 +51,14 @@ def process_patient(i, patient, file_list, norm, do_resample, features, target_v
         else:
             raise ValueError("Value of 'norm' parameter should be 'new' of 'ws'")
 
+
         # Feature Extraction by Radiomics
         ADC_values, ADC_columns = feature_extract(ADC_array, INFARCT_array, features)
         FLAIR_values, FLAIR_columns = feature_extract(FLAIR_array, INFARCT_array, features)
-        
+
         total_values = ADC_values + FLAIR_values
         # total_columns = ['ADC_' + col for col in ADC_columns] + ['FLAIR_' + col for col in ADC_columns]
+
         return (total_values, i, patient)
 
     except Exception as ex:
@@ -60,7 +66,9 @@ def process_patient(i, patient, file_list, norm, do_resample, features, target_v
         return ex
 
 
-def process_patient_wrapper(X, y, patient_num, error_patient, patient_list, file_list, patient_type, norm, do_resample, features, target_voxel):
+def process_patient_wrapper(X, y, patient_num, error_patient, patient_list, file_list, patient_type,
+                            norm, do_resample, features, target_voxel):
+
     assert patient_type in ["Positive", "Negative", "Test"]
     target = 1 if patient_type == "Positive" else 0
 
@@ -71,6 +79,7 @@ def process_patient_wrapper(X, y, patient_num, error_patient, patient_list, file
 
     output = [future.result() for future in futures]
     for out in output:
+
         time = str(datetime.datetime.now()).split()[1].split('.')[0]
         if isinstance(out, Exception):
             msg, i, patient = out.args
@@ -81,8 +90,7 @@ def process_patient_wrapper(X, y, patient_num, error_patient, patient_list, file
         else:
             total_values, i, patient = out
             X.append(total_values)
-            
-            if patient_type in ["Positive", "Negative"] :
+            if patient_type in ["Positive", "Negative"]:
                 y.append(target)
             patient_num.append(patient)
 
@@ -104,8 +112,11 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
     patient_num = []
     error_patient = []
 
-    process_patient_wrapper(X, y, patient_num, error_patient, pos_patient_list, pos_file_list, "Positive", norm, do_resample, features, target_voxel)
-    process_patient_wrapper(X, y, patient_num, error_patient, neg_patient_list, neg_file_list, "Negative", norm, do_resample, features, target_voxel)
+    process_patient_wrapper(X, y, patient_num, error_patient, pos_patient_list, pos_file_list, "Positive",
+                            norm, do_resample, features, target_voxel)
+
+    process_patient_wrapper(X, y, patient_num, error_patient, neg_patient_list, neg_file_list, "Negative",
+                            norm, do_resample, features, target_voxel)
 
     if do_shuffle:
         shuffle_list = [[X_value, y_value, num] for X_value, y_value, num in zip(X, y, patient_num)]
@@ -123,6 +134,7 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
     return X, y
 
 
+
 # Feature Extraction for Inference
 def test_data_loader(test_dir='/data/test/', norm='new',
                      do_resample=True,
@@ -137,7 +149,9 @@ def test_data_loader(test_dir='/data/test/', norm='new',
     patient_num = []
     error_patient = []
 
-    process_patient_wrapper(X, [], patient_num, error_patient, test_patient_list, test_file_list, "Test", norm, do_resample, features, target_voxel)
+    process_patient_wrapper(X, [], patient_num, error_patient, test_patient_list, test_file_list, "Test",
+                            norm, do_resample, features, target_voxel)
 
     X = np.array(X)
+    
     return X, patient_num, error_patient
