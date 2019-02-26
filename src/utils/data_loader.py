@@ -153,5 +153,6 @@ def test_data_loader(test_dir='/data/test/', norm='new',
                             norm, do_resample, features, target_voxel)
 
     X = np.array(X)
-    
+    time = str(datetime.datetime.now()).split()[1].split('.')[0]
+    print("Created X of shape {} ({})".format(X.shape, time))
     return X, patient_num, error_patient

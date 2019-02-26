@@ -13,6 +13,13 @@ import numpy as np
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 
+def get_stacking_base_model(models, models_num) :
+    result = []
+    for idx in models_num :
+        result.append(models[idx-1])
+        
+    return result
+
 def stacking(models, data, include, predict_binary=[None]) : 
     result = []
     
@@ -75,7 +82,7 @@ def stacking_logistic(S_train, y_train, stacking_params=None, cv=5, beta=0.5) :
     
     return meta_model
     
-def stacking_weight(S_train, y_train, cv=5, epochs=30) :
+def stacking_weight(S_train, y_train, cv=5, epochs=20) :
     def stack_fn(num_models=len(S_train[0])):
         model = Sequential()
         model.add(Dense(2, input_dim=num_models, activation='softmax'))
@@ -87,17 +94,29 @@ def stacking_weight(S_train, y_train, cv=5, epochs=30) :
     meta_model.fit(S_train, y_train, epochs=epochs)
     return meta_model
     
-def stacking_NN(S_train, y_train, cv=5, epochs=30) :
+def stacking_NN(S_train, y_train, cv=5, epochs=20, deep = False) :
     def stack_fn(num_models=len(S_train[0])):
         model = Sequential()
         model.add(Dense(16, input_dim=num_models, activation='relu'))
-        model.add(Dense(16, input_dim=16, activation='relu'))
         model.add(Dense(2, activation='softmax'))
 
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         return model
     
-    meta_model = KerasClassifier(build_fn=stack_fn)
+    def stack_fn2(num_models=len(S_train[0])):
+        model = Sequential()
+        model.add(Dense(8, input_dim=num_models, activation='relu'))
+        model.add(Dense(8, input_dim=8, activation='relu'))
+        model.add(Dense(2, activation='softmax'))
+
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        return model
+    
+    if deep :
+        meta_model = KerasClassifier(build_fn=stack_fn2)
+    else :
+        meta_model = KerasClassifier(build_fn=stack_fn)
+        
     meta_model.fit(S_train, y_train, epochs=epochs)
     return meta_model
 

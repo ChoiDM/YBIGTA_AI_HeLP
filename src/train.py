@@ -2,6 +2,7 @@ from utils.data_loader import train_data_loader, test_data_loader
 from utils.inference_tools import pred_to_binary, export_csv, making_result
 from utils.model_stacking import *
 from utils.model_ml import *
+import vecstack
 
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
@@ -35,6 +36,8 @@ print("Start:", time, "\n")
 path = "/data"
 pos_dir = path+"/train/positive/"
 neg_dir = path+"/train/negative/"
+save_dir = path+"/model/"
+test_dir = path+'/test/'
 
 
 # Setting
@@ -44,15 +47,16 @@ BETA2=0.5
 cv=5
 threshold = "auto"
 norm = 'new'
+deep = False
 include_model = [1,4,10,11,12]
 include_model2 = [1,2,3,4]
 include_model3 = []
 
 
 # Print Information
-name = 'KHW2_1_layer'
+name = 'KHW2_1_layer_grid'
 model = 'ML Stacking'
-summary1 = 'HyperParams tuning with {} ML models + 1 stacking model(NN)'.format(len(include_model))
+summary1 = 'HyperParams tuning with {} ML models + 1 stacking model(NN-deep:{})'.format(len(include_model), deep)
 summary2 = "BETA={} + BETA2={} + cv={} + threshold={} + Norm={}".format(BETA, BETA2, cv, threshold, norm)
 
 print('Author Name :', name)
@@ -72,6 +76,10 @@ do_resample = True
 do_shuffle = True
 
 X_train, y_train = train_data_loader(pos_dir, neg_dir, norm, do_resample, do_shuffle, features, target_voxel)
+X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, features, target_voxel)
+
+np.save(save_dir+"X_train.npy", X_train)
+np.save(save_dir+"y_train.npy", y_train)
 
 
 ####################################################################z#####################################################
@@ -87,7 +95,7 @@ print("\n---------- Start ML Train ----------")
 print("model1")
 m1_params1 = {'subsample': [0.6], 'colsample_bytree': [0.6], 'min_child_weight': [0.5], 'probability': [True], 
               'gamma': [3.0], 'n_estimators': [300], 'learning_rate': [0.01], 'max_depth': [7]}
-model1 = ml_xgb(X_train, y_train, cv=cv, beta=BETA, params=m1_params1)
+model1 = ml_xgb(X_train, y_train, cv=cv, beta=BETA, params=None)
 
 #########
 ## model2
@@ -104,7 +112,7 @@ model3 = ml_logistic(X_train, y_train, cv=cv, beta=BETA)
 ## model4
 print("\nmodel4")
 m4_params1 = {'n_estimators': [500], 'min_samples_leaf': [50], 'max_depth': [15]}
-model4 = ml_rf(X_train, y_train, cv=cv, beta=BETA, params=m4_params1)
+model4 = ml_rf(X_train, y_train, cv=cv, beta=BETA, params=None)
 
 #########
 ## model5
@@ -140,7 +148,7 @@ model9 = ml_larsLasso(X_train, y_train, cv=cv, beta=BETA, params=m9_params1)
 ## model10
 print("\nmodel10")
 m10_params1 =  {'n_estimators': [50], 'max_depth': [3]}
-model10 = ml_extraTrees(X_train, y_train, cv=cv, beta=BETA, params=m10_params1)
+model10 = ml_extraTrees(X_train, y_train, cv=cv, beta=BETA, params=None)
 
 ##########
 ## model11
@@ -176,21 +184,24 @@ pickle.dump(model12, open(path+'/model/model12.pickle.dat', 'wb'))
 # Fit stacking model
 print("\n---------- Start Staking Train ----------")
 
-
 # Layer1
 print("\n---------- Layer1 ----------")
 models = [model1, model2, model3, model4, model5, model6, model7, model8, model9, model10, model11, model12]
-S_train = stacking(models, X_train, include_model)
+S_models = get_stacking_base_model(models, include_model)
+
+scorer = make_scorer(fbeta_score, beta=BETA2)
+S_train, S_test = vecstack.stacking(S_models, X_train, y_train, X_test, regression = False, metric=scorer, n_folds=cv, verbose=0)
 
 meta_xgb = stacking_xgb(S_train, y_train, cv=cv, beta=BETA2)
 meta_logistic = stacking_logistic(S_train, y_train, cv=cv, beta=BETA2)
-meta_NN = stacking_NN(S_train, y_train)
+meta_NN = stacking_NN(S_train, y_train, deep=deep)
 meta_weight = stacking_weight(S_train, y_train)
 
 y_pred_lst = []
 y_pred_binary_lst =[]
 y_pred_lst2 = []
 y_pred_binary_lst2 =[]
+
 for meta in [meta_xgb, meta_logistic, meta_NN, meta_weight] :
     pred = meta.predict_proba(S_train)[:, 1]
     y_pred_lst.append(pred)
@@ -220,6 +231,7 @@ with open(path+'/model/meta_weight.json', 'w') as f :
 #------------------------------------------------------------------------------------------------------------------------
 
 print("\n---------- train.py finished ----------")
+print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 
 
 

@@ -1,6 +1,7 @@
 from utils.data_loader import test_data_loader
 from utils.inference_tools import pred_to_binary, export_csv, making_result
 from utils.model_stacking import *
+import vecstack
 
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
@@ -26,11 +27,14 @@ pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 
 path = "/data"
+save_dir = path+"/model/"
 test_dir = path+'/test/'
 
 
 # Setting
 # Set your params here!!!
+BETA2=0.5
+cv=5
 threshold = "auto"
 norm = 'new'
 include_model = [1,4,10,11,12]
@@ -40,12 +44,15 @@ final_idx = 3
 
 
 # Data Load
+print("---------- Start ----------")
 print("\n---------- Data Load ----------")
 features = ['firstorder', 'shape']
 target_voxel = (0.65, 0.65, 3)
 do_resample = True
 
 X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, features, target_voxel)
+X_train = np.load(save_dir+"X_train.npy")
+y_train = np.load(save_dir+"y_train.npy")
 
 
 #########################################################################################################################
@@ -94,10 +101,12 @@ models = [model1, model2, model3, model4, model5, model6, model7, model8, model9
 models2 = [meta_xgb, meta_logistic, meta_NN, meta_weight]
 models3 = []
 
-
 # Layer1
 print("\n---------- Layer1 ----------")
-S_test = stacking(models, X_test, include_model)
+S_models = get_stacking_base_model(models, include_model)
+scorer = make_scorer(fbeta_score, beta=BETA2)
+S_train, S_test = vecstack.stacking(S_models, X_train, y_train, X_test, regression = False, metric=scorer, n_folds=cv, verbose=0)
+
 y_pred_lst = []
 y_pred_binary_lst =[]
 y_pred_lst2 = []
