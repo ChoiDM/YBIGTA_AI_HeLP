@@ -17,7 +17,7 @@ pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 
 
-def ml_xgb(X_train, y_train, cv=5, beta=0.75, params = None) :
+def ml_xgb(X_train, y_train, cv=5, beta=0.75, params = None, random_state=1213) :
     model = XGBClassifier()
     scorer = make_scorer(fbeta_score, beta=beta)
     
@@ -30,7 +30,8 @@ def ml_xgb(X_train, y_train, cv=5, beta=0.75, params = None) :
             'colsample_bytree' : [0.5, 0.6, 0.8, 1.0],
             'probability' : [True],
             'learning_rate' : [0.01, 0.05, 0.1],
-            'n_estimators' : [300, 500, 700]
+            'n_estimators' : [300, 500, 700], 
+            'random_state' : [random_state]
         }
     
     model_grid = GridSearchCV(model, param_grid=params, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
@@ -85,7 +86,7 @@ def ml_logistic(X_train, y_train, cv=5, beta=0.75, params = None) :
     
     return best_model
 
-def ml_rf(X_train, y_train, cv=5, beta=0.75, params = None) :
+def ml_rf(X_train, y_train, cv=5, beta=0.75, params = None, random_state=1213) :
     model = RandomForestClassifier()
     scorer = make_scorer(fbeta_score, beta=beta)
     
@@ -93,7 +94,8 @@ def ml_rf(X_train, y_train, cv=5, beta=0.75, params = None) :
         params = {
             'max_depth' : [6, 8, 10, 15, 20, 30, 40, 50],
             'min_samples_leaf': [1, 2, 3, 4, 5,10, 20, 50],
-            'n_estimators' : [100, 300, 500]
+            'n_estimators' : [100, 300, 500], 
+            'random_state' : [random_state]
         }
     
     model_grid = GridSearchCV(model, param_grid=params, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
@@ -233,14 +235,15 @@ def ml_larsLasso(X_train, y_train, cv=5, beta=0.75, params = None) :
     print("Threshold :", best_t)
     print("Best Params : {}".format(model_grid.best_params_))
     
-def ml_extraTrees(X_train, y_train, cv=5, beta=0.75, params = None) :
+def ml_extraTrees(X_train, y_train, cv=5, beta=0.75, params = None, random_state=1213) :
     model = ExtraTreesClassifier()
     scorer = make_scorer(fbeta_score, beta=beta)
     
     if not params :
         params = {
             'max_depth' : [None, 3, 5, 7, 9],
-            'n_estimators' : [10, 50, 100, 300, 500]
+            'n_estimators' : [10, 50, 100, 300, 500], 
+            'random_state' : [random_state]
         }
     
     model_grid = GridSearchCV(model, param_grid=params, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
@@ -253,7 +256,7 @@ def ml_extraTrees(X_train, y_train, cv=5, beta=0.75, params = None) :
     
     return best_model
 
-def ml_adaboost(X_train, y_train, cv=5, beta=0.75, params = None) :
+def ml_adaboost(X_train, y_train, cv=5, beta=0.75, params = None, random_state=1213) :
     model = AdaBoostClassifier()
     scorer = make_scorer(fbeta_score, beta=beta)
     
@@ -261,7 +264,8 @@ def ml_adaboost(X_train, y_train, cv=5, beta=0.75, params = None) :
         params = {
             'n_estimators' : [100, 300, 500],
             'learning_rate' : [0.01, 0.05, 0.1],
-            'algorithm' :['SAMME.R']
+            'algorithm' :['SAMME.R'], 
+            'random_state' : [random_state]
         }
     
     model_grid = GridSearchCV(model, param_grid=params, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
@@ -274,7 +278,7 @@ def ml_adaboost(X_train, y_train, cv=5, beta=0.75, params = None) :
     
     return best_model
 
-def ml_lightgbm(X_train, y_train, cv=5, beta=0.75, params = None) :
+def ml_lightgbm(X_train, y_train, cv=5, beta=0.75, params = None, random_state=1213) :
     model = LGBMClassifier()
     scorer = make_scorer(fbeta_score, beta=beta)
     
@@ -286,7 +290,8 @@ def ml_lightgbm(X_train, y_train, cv=5, beta=0.75, params = None) :
             'learning_rate' : [0.05, 0.1],
             'n_estimators' : [100, 300],
             'reg_alpha' : [0.0, 1.0, 2.0, 5.0], 
-            'reg_lambda' : [0.0, 1.0, 2.0, 5.0]
+            'reg_lambda' : [0.0, 1.0, 2.0, 5.0], 
+            'random_state' : [random_state]
         }
     
     model_grid = GridSearchCV(model, param_grid=params, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)
