@@ -37,6 +37,7 @@ BETA2=0.5
 cv=5
 threshold = "auto"
 norm = 'ws'
+random_state=1213
 include_model = [1,4,10,11,12]
 include_model2 = [1,2,3,4]
 include_model3 = []
@@ -105,7 +106,8 @@ models3 = []
 print("\n---------- Layer1 ----------")
 S_models = get_stacking_base_model(models, include_model)
 scorer = make_scorer(fbeta_score, beta=BETA2)
-S_train, S_test = vecstack.stacking(S_models, X_train, y_train, X_test, regression = False, metric=scorer, n_folds=cv, needs_proba=True)
+S_train, S_test = vecstack.stacking(S_models, X_train, y_train, X_test, regression = False, metric=scorer, n_folds=cv, needs_proba=True, random_state=random_state)
+S_test = S_test[:,[idx+1 for idx in range(0,len(include_model)*2,2)]]
 
 y_pred_lst = []
 y_pred_binary_lst =[]

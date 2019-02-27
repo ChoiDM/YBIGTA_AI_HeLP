@@ -37,7 +37,7 @@ def stacking(models, data, include, predict_binary=[None]) :
     return np.array(result).T
 
 
-def stacking_xgb(S_train, y_train, stacking_params=None, cv=5, beta=0.5) :
+def stacking_xgb(S_train, y_train, stacking_params=None, cv=5, beta=0.5, random_state=1213) :
     stacking_model = XGBClassifier()
     scorer = make_scorer(fbeta_score, beta=beta)
     
@@ -50,7 +50,8 @@ def stacking_xgb(S_train, y_train, stacking_params=None, cv=5, beta=0.5) :
             'colsample_bytree' : [0.5, 0.6, 0.8, 1.0],
             'probability' : [True],
             'learning_rate' : [0.01, 0.05, 0.1],
-            'n_estimators' : [100, 200, 300]
+            'n_estimators' : [100, 200, 300], 
+            'random_state' : [random_state]
         }
     
     stacking_grid = GridSearchCV(stacking_model, param_grid=stacking_params, scoring=scorer, cv=cv, verbose=0, n_jobs=-1)

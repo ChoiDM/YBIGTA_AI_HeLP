@@ -48,6 +48,7 @@ cv=5
 threshold = "auto"
 norm = 'ws'
 deep = True
+random_state=1213
 include_model = [1,4,10,11,12]
 include_model2 = [1,2,3,4]
 include_model3 = []
@@ -55,7 +56,7 @@ include_model3 = []
 
 # Print Information
 name = 'KHW2_1_layer_grid'
-model = 'ML Stacking'
+model = 'ML Stacking (random_state : {})'.format(random_state)
 summary1 = 'HyperParams tuning with {} ML models + 1 stacking model(NN-deep:{})'.format(len(include_model), deep)
 summary2 = "BETA={} + BETA2={} + cv={} + threshold={} + Norm={}".format(BETA, BETA2, cv, threshold, norm)
 
@@ -94,8 +95,8 @@ print("\n---------- Start ML Train ----------")
 ## model1
 print("model1")
 m1_params1 = {'subsample': [0.6], 'colsample_bytree': [0.6], 'min_child_weight': [0.5], 'probability': [True], 
-              'gamma': [3.0], 'n_estimators': [300], 'learning_rate': [0.01], 'max_depth': [7]}
-model1 = ml_xgb(X_train, y_train, cv=cv, beta=BETA, params=None)
+              'gamma': [3.0], 'n_estimators': [300], 'learning_rate': [0.01], 'max_depth': [7], 'random_state' : [1213]}
+model1 = ml_xgb(X_train, y_train, cv=cv, beta=BETA, params=None, random_state=random_state)
 
 #########
 ## model2
@@ -111,8 +112,8 @@ model3 = ml_logistic(X_train, y_train, cv=cv, beta=BETA)
 #########
 ## model4
 print("\nmodel4")
-m4_params1 = {'n_estimators': [500], 'min_samples_leaf': [50], 'max_depth': [15]}
-model4 = ml_rf(X_train, y_train, cv=cv, beta=BETA, params=None)
+m4_params1 = {'n_estimators': [500], 'min_samples_leaf': [50], 'max_depth': [15], 'random_state' : [1213]}
+model4 = ml_rf(X_train, y_train, cv=cv, beta=BETA, params=None, random_state=random_state)
 
 #########
 ## model5
@@ -147,18 +148,18 @@ model9 = ml_larsLasso(X_train, y_train, cv=cv, beta=BETA, params=m9_params1)
 ##########
 ## model10
 print("\nmodel10")
-m10_params1 =  {'n_estimators': [50], 'max_depth': [3]}
-model10 = ml_extraTrees(X_train, y_train, cv=cv, beta=BETA, params=None)
+m10_params1 =  {'n_estimators': [50], 'max_depth': [3], 'random_state' : [1213]}
+model10 = ml_extraTrees(X_train, y_train, cv=cv, beta=BETA, params=None, random_state=random_state)
 
 ##########
 ## model11
 print("\nmodel11")
-model11 = ml_adaboost(X_train, y_train, cv=cv, beta=BETA, params=None)
+model11 = ml_adaboost(X_train, y_train, cv=cv, beta=BETA, params=None, random_state=random_state)
 
 ##########
 ## model12
 print("\nmodel12")
-model12 = ml_lightgbm(X_train, y_train, cv=cv, beta=BETA, params=None)
+model12 = ml_lightgbm(X_train, y_train, cv=cv, beta=BETA, params=None, random_state=random_state)
 #------------------------------------------------------------------------------------------------------------------------
 
 
@@ -190,7 +191,8 @@ models = [model1, model2, model3, model4, model5, model6, model7, model8, model9
 S_models = get_stacking_base_model(models, include_model)
 
 scorer = make_scorer(fbeta_score, beta=BETA2)
-S_train, S_test = vecstack.stacking(S_models, X_train, y_train, X_test, regression = False, metric=scorer, n_folds=cv, needs_proba=True)
+S_train, S_test = vecstack.stacking(S_models, X_train, y_train, X_test, regression = False, metric=scorer, n_folds=cv, needs_proba=True, random_state=random_state)
+S_train = S_train[:,[idx+1 for idx in range(0,len(include_model)*2,2)]]
 
 meta_xgb = stacking_xgb(S_train, y_train, cv=cv, beta=BETA2)
 meta_logistic = stacking_logistic(S_train, y_train, cv=cv, beta=BETA2)
