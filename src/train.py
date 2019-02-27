@@ -46,8 +46,8 @@ BETA=0.75
 BETA2=0.5
 cv=5
 threshold = "auto"
-norm = 'ws'
-deep = False
+norm = 'new'
+deep = True
 include_model = [1,4,10,11,12]
 include_model2 = [1,2,3,4]
 include_model3 = []
@@ -190,7 +190,7 @@ models = [model1, model2, model3, model4, model5, model6, model7, model8, model9
 S_models = get_stacking_base_model(models, include_model)
 
 scorer = make_scorer(fbeta_score, beta=BETA2)
-S_train, S_test = vecstack.stacking(S_models, X_train, y_train, X_test, regression = False, metric=scorer, n_folds=cv, verbose=0)
+S_train, S_test = vecstack.stacking(S_models, X_train, y_train, X_test, regression = False, metric=scorer, n_folds=cv, needs_proba=True)
 
 meta_xgb = stacking_xgb(S_train, y_train, cv=cv, beta=BETA2)
 meta_logistic = stacking_logistic(S_train, y_train, cv=cv, beta=BETA2)
