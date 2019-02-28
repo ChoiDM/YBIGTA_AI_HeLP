@@ -33,8 +33,6 @@ test_dir = path+'/test/'
 
 # Setting
 # Set your params here!!!
-BETA2=0.5
-cv=5
 threshold = "auto"
 norm = 'new'
 random_state=1213
@@ -52,8 +50,6 @@ target_voxel = (0.65, 0.65, 3)
 do_resample = True
 
 X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, features, target_voxel)
-X_train = np.load(save_dir+"X_train.npy")
-y_train = np.load(save_dir+"y_train.npy")
 
 
 #########################################################################################################################
@@ -104,10 +100,7 @@ models3 = []
 
 # Layer1
 print("\n---------- Layer1 ----------")
-S_models = get_stacking_base_model(models, include_model)
-scorer = make_scorer(fbeta_score, beta=BETA2)
-S_train, S_test = vecstack.stacking(S_models, X_train, y_train, X_test, regression = False, metric=scorer, n_folds=cv, needs_proba=True, random_state=random_state)
-S_test = S_test[:,[idx+1 for idx in range(0,len(include_model)*2,2)]]
+S_test = stacking(models, X_test, include_model)
 
 y_pred_lst = []
 y_pred_binary_lst =[]

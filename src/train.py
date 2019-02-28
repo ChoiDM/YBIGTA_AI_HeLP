@@ -77,10 +77,7 @@ do_resample = True
 do_shuffle = True
 
 X_train, y_train = train_data_loader(pos_dir, neg_dir, norm, do_resample, do_shuffle, features, target_voxel)
-X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, features, target_voxel)
 
-np.save(save_dir+"X_train.npy", X_train)
-np.save(save_dir+"y_train.npy", y_train)
 
 
 ####################################################################z#####################################################
@@ -188,11 +185,7 @@ print("\n---------- Start Staking Train ----------")
 # Layer1
 print("\n---------- Layer1 ----------")
 models = [model1, model2, model3, model4, model5, model6, model7, model8, model9, model10, model11, model12]
-S_models = get_stacking_base_model(models, include_model)
-
-scorer = make_scorer(fbeta_score, beta=BETA2)
-S_train, S_test = vecstack.stacking(S_models, X_train, y_train, X_test, regression = False, metric=scorer, n_folds=cv, needs_proba=True, random_state=random_state)
-S_train = S_train[:,[idx+1 for idx in range(0,len(include_model)*2,2)]]
+S_train = stacking(models, X_train, include_model)
 
 meta_xgb = stacking_xgb(S_train, y_train, cv=cv, beta=BETA2)
 meta_logistic = stacking_logistic(S_train, y_train, cv=cv, beta=BETA2)
