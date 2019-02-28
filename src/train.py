@@ -108,7 +108,7 @@ def dl_mlp(X_train, y_train, num_units=256, hidden_layers=3, epochs=30, loss="cr
     MLP_model.fit(X_train, y_train, epochs=epochs)
     return MLP_model
 
-MLP = dl_MLP(X_train, y_train, num_units=num_units, hidden_layers=hidden_layers, epochs=epochs, loss=loss, gamma=gamma, alpha=alpha)
+MLP = dl_mlp(X_train, y_train, num_units=num_units, hidden_layers=hidden_layers, epochs=epochs, loss=loss)
 #------------------------------------------------------------------------------------------------------------------------
 
 

@@ -26,7 +26,7 @@ warnings.filterwarnings('ignore')
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 
-path = "./notebook/data"
+path = "/data"
 save_dir = path+"/model/"
 test_dir = path+'/test/'
 
