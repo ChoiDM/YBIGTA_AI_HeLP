@@ -13,7 +13,7 @@ from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.metrics import fbeta_score, make_scorer
 
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.utils import np_utils
 
@@ -33,7 +33,7 @@ time = str(datetime.datetime.now()).split()[1].split('.')[0]
 print("---------- Start ----------")
 print("Start:", time, "\n")
 
-path = "/data"
+path = "./notebook/data"
 pos_dir = path+"/train/positive/"
 neg_dir = path+"/train/negative/"
 save_dir = path+"/model/"
@@ -42,31 +42,26 @@ test_dir = path+'/test/'
 
 # Setting
 # Set your params here!!!
-BETA=0.75
-BETA2=0.5
-cv=5
 threshold = "auto"
 norm = 'new'
-deep = True
-random_state=1213
-include_model = [1,4,10,11,12]
-include_model2 = [1,2,3,4]
-include_model3 = []
+num_units=256 
+hidden_layers=3
+epochs=30
+loss="cross_entropy_loss"
+gamma = 2.0
+alpha = 0.25
 
 
 # Print Information
-name = 'KHW2_1_layer_grid'
-model = 'ML Stacking (random_state : {})'.format(random_state)
-summary1 = 'HyperParams tuning with {} ML models + 1 stacking model(NN-deep:{})'.format(len(include_model), deep)
-summary2 = "BETA={} + BETA2={} + cv={} + threshold={} + Norm={}".format(BETA, BETA2, cv, threshold, norm)
+name = 'KHW2_MLP'
+model = 'MLP'
+summary1 = 'Hyperparams with MLP'
+summary2 = "threshold={} + norm={} + num_units={} + hidden_layers={} + epochs={} + loss={} + gamma={} + alpha={}".format(threshold, norm, num_units, hidden_layers, epochs, loss, gamma, alpha)
 
 print('Author Name :', name)
 print('Model :', model)
 print('Summary :', summary1)
 print('Summary2 :', summary2)
-print('Include models for layer1 :', include_model)
-print('Include models for layer2 :', include_model2)
-print('Include models for layer3 :', include_model3)
 
 
 # Data Load
@@ -88,148 +83,55 @@ np.save(save_dir+"y_train.npy", y_train)
 #### Modify here ####
 
 #------------------------------------------------------------------------------------------------------------------------
-# Fit ML model with training data
-print("\n---------- Start ML Train ----------")
+# Fit model with training data
+print("\n---------- Start Train ----------")
 
 #########
 ## model1
-print("model1")
-m1_params1 = {'subsample': [0.6], 'colsample_bytree': [0.6], 'min_child_weight': [0.5], 'probability': [True], 
-              'gamma': [3.0], 'n_estimators': [300], 'learning_rate': [0.01], 'max_depth': [7], 'random_state' : [1213]}
-model1 = ml_xgb(X_train, y_train, cv=cv, beta=BETA, params=None, random_state=random_state)
-
-#########
-## model2
-print("\nmodel2")
-m2_params1 = {'probability': [True], 'degree': [2], 'C': [0.001], 'gamma': [0.001]}
-model2 = ml_svm(X_train, y_train, cv=cv, beta=BETA, params=m2_params1)
-
-#########
-## model3
-print("\nmodel3")
-model3 = ml_logistic(X_train, y_train, cv=cv, beta=BETA)
-
-#########
-## model4
-print("\nmodel4")
-m4_params1 = {'n_estimators': [500], 'min_samples_leaf': [50], 'max_depth': [15], 'random_state' : [1213]}
-model4 = ml_rf(X_train, y_train, cv=cv, beta=BETA, params=None, random_state=random_state)
-
-#########
-## model5
-print("\nmodel5")
-m5_params1 = {'penalty': ['l1'], 'C': [1], 'max_iter': [900]}
-model5 = ml_lasso(X_train, y_train, cv=cv, beta=BETA, params=m5_params1)
-
-#########
-## model6
-print("\nmodel6")
-m6_params1 =  {'alpha': [10], 'max_iter': [None]}
-model6 = ml_ridge(X_train, y_train, cv=cv, beta=BETA, params=m6_params1)
-
-#########
-## model7
-print("\nmodel7")
-m7_params1 =  {'penalty': ['elasticnet'], 'loss': ['log'], 'alpha': [100], 'l1_ratio': [0.5], 'max_iter': [1400]}
-model7 = ml_elasticNet(X_train, y_train, cv=cv, beta=BETA, params=m7_params1)
-
-#########
-## model8
-print("\nmodel8")
-m8_params1 =  {'n_nonzero_coefs': [70]}
-model8 = ml_lars(X_train, y_train, cv=cv, beta=BETA, params=m8_params1)
-
-#########
-## model9
-print("\nmodel9")
-m9_params1 =  {'alpha': [0.1], 'max_iter': [800]}
-model9 = ml_larsLasso(X_train, y_train, cv=cv, beta=BETA, params=m9_params1)
-
-##########
-## model10
-print("\nmodel10")
-m10_params1 =  {'n_estimators': [50], 'max_depth': [3], 'random_state' : [1213]}
-model10 = ml_extraTrees(X_train, y_train, cv=cv, beta=BETA, params=None, random_state=random_state)
-
-##########
-## model11
-print("\nmodel11")
-model11 = ml_adaboost(X_train, y_train, cv=cv, beta=BETA, params=None, random_state=random_state)
-
-##########
-## model12
-print("\nmodel12")
-model12 = ml_lightgbm(X_train, y_train, cv=cv, beta=BETA, params=None, random_state=random_state)
-#------------------------------------------------------------------------------------------------------------------------
-
-
-#------------------------------------------------------------------------------------------------------------------------
-# Save ML model
-print("\n---------- Save ML Model ----------")
-pickle.dump(model1, open(path+'/model/model1.pickle.dat', 'wb'))
-pickle.dump(model2, open(path+'/model/model2.pickle.dat', 'wb'))
-pickle.dump(model3, open(path+'/model/model3.pickle.dat', 'wb'))
-pickle.dump(model4, open(path+'/model/model4.pickle.dat', 'wb'))
-pickle.dump(model5, open(path+'/model/model5.pickle.dat', 'wb'))
-pickle.dump(model6, open(path+'/model/model6.pickle.dat', 'wb'))
-pickle.dump(model7, open(path+'/model/model7.pickle.dat', 'wb'))
-pickle.dump(model8, open(path+'/model/model8.pickle.dat', 'wb'))
-pickle.dump(model9, open(path+'/model/model9.pickle.dat', 'wb'))
-pickle.dump(model10, open(path+'/model/model10.pickle.dat', 'wb'))
-pickle.dump(model11, open(path+'/model/model11.pickle.dat', 'wb'))
-pickle.dump(model12, open(path+'/model/model12.pickle.dat', 'wb'))
-#------------------------------------------------------------------------------------------------------------------------
-
-
-#------------------------------------------------------------------------------------------------------------------------
-# Fit stacking model
-print("\n---------- Start Staking Train ----------")
-
-# Layer1
-print("\n---------- Layer1 ----------")
-models = [model1, model2, model3, model4, model5, model6, model7, model8, model9, model10, model11, model12]
-S_models = get_stacking_base_model(models, include_model)
-
-scorer = make_scorer(fbeta_score, beta=BETA2)
-S_train, S_test = vecstack.stacking(S_models, X_train, y_train, X_test, regression = False, metric=scorer, n_folds=cv, needs_proba=True, random_state=random_state)
-S_train = S_train[:,[idx+1 for idx in range(0,len(include_model)*2,2)]]
-
-meta_xgb = stacking_xgb(S_train, y_train, cv=cv, beta=BETA2)
-meta_logistic = stacking_logistic(S_train, y_train, cv=cv, beta=BETA2)
-meta_NN = stacking_NN(S_train, y_train, deep=deep)
-meta_weight = stacking_weight(S_train, y_train)
-
-y_pred_lst = []
-y_pred_binary_lst =[]
-y_pred_lst2 = []
-y_pred_binary_lst2 =[]
-
-for meta in [meta_xgb, meta_logistic, meta_NN, meta_weight] :
-    pred = meta.predict_proba(S_train)[:, 1]
-    y_pred_lst.append(pred)
-    y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold))
-
+def MLP_layers(X_train, y_train, num_units=256, hidden_layers=3, epochs=30, loss="cross_entropy_loss", gamma=2.0, alpha=0.25) :
     
-# Print result
-print("\n")
-print(making_result(S_train, y_pred_lst, y_pred_binary_lst, y_pred_lst2, y_pred_binary_lst2, include_model, include_model2, include_model3, y_train))
-#------------------------------------------------------------------------------------------------------------------------
+    def focal_loss(gamma=gamma, alpha=alpha) :
+        def focal_loss_fixed(y_true, y_pred):
+            eps = 1e-12
+            y_pred=K.clip(y_pred, eps, 1.0-eps)
+            
+            pt_1 = tf.where(tf.equal(y_true, 1), y_pred, tf.ones_like(y_pred))
+            pt_0 = tf.where(tf.equal(y_true, 0), y_pred, tf.zeros_like(y_pred))
+            return -K.sum(alpha*K.pow(1.0-pt_1, gamma)*K.log(pt_1)) -K.sum((1-alpha)*K.pow(pt_0, gamma)*K.log(1.0-pt_0))
+        return focal_loss_fixed
 
-
-#------------------------------------------------------------------------------------------------------------------------
-# Save stacking model 1
-print("\n---------- Save Staking Model ----------")
-
-pickle.dump(meta_xgb, open(path+'/model/meta_xgb.pickle.dat', 'wb'))
-pickle.dump(meta_logistic, open(path+'/model/meta_logistic.pickle.dat', 'wb'))
-
-meta_NN.model.save_weights(path+'/model/meta_NN.h5')
-with open(path+'/model/meta_NN.json', 'w') as f :
-    f.write(meta_NN.model.to_json())
+    def stack_fn(num_models=X_train.shape[1], num_units=num_units, hidden_layers=hidden_layers, loss=loss):
+        model = Sequential()
+        
+        for _ in range(hidden_layers) :
+            model.add(Dense(num_units, input_dim=num_models, activation='relu'))
+            model.add(Dropout(0.5))
+        
+        model.add(Dense(32, input_dim=num_units, activation='relu'))
+        model.add(Dense(2, activation='softmax'))
+        
+        if loss == 'cross_entropy_loss' :
+            model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        elif loss == 'focal_loss' :
+            model.compile(loss=focal_loss, optimizer='adam', metrics=['accuracy'])
+            
+        return model
     
-meta_weight.model.save_weights(path+'/model/meta_weight.h5')
-with open(path+'/model/meta_weight.json', 'w') as f :
-    f.write(meta_weight.model.to_json())
+    MLP_model = KerasClassifier(build_fn=stack_fn)    
+    MLP_model.fit(X_train, y_train, epochs=epochs)
+    return MLP_model
+
+MLP = MLP_layers(X_train, y_train, num_units=num_units, hidden_layers=hidden_layers, epochs=epochs, loss=loss, gamma=gamma, alpha=alpha)
+#------------------------------------------------------------------------------------------------------------------------
+
+
+#------------------------------------------------------------------------------------------------------------------------
+# Save model
+print("\n---------- Save Model ----------")
+
+MLP.model.save_weights(path+'/model/MLP.h5')
+with open(path+'/model/MLP.json', 'w') as f :
+    f.write(MLP.model.to_json())
 #------------------------------------------------------------------------------------------------------------------------
 
 print("\n---------- train.py finished ----------")
