@@ -47,7 +47,7 @@ def process_patient(i, patient, file_list, norm, do_resample, features, target_v
         if norm == 'ws':
             FLAIR_array = ws_normalize(FLAIR_array, 'FLAIR', BRAIN_array)
         elif norm == 'new':
-            FLAIR_array = normalization(FLAIR_array, INFARCT_array)
+            FLAIR_array = normalization(FLAIR_array, INFARCT_array, size = 8)
         else:
             raise ValueError("Value of 'norm' parameter should be 'new' of 'ws'")
 
@@ -153,6 +153,5 @@ def test_data_loader(test_dir='/data/test/', norm='new',
                             norm, do_resample, features, target_voxel)
 
     X = np.array(X)
-    time = str(datetime.datetime.now()).split()[1].split('.')[0]
-    print("Created X of shape {} ({})".format(X.shape, time))
+    
     return X, patient_num, error_patient
