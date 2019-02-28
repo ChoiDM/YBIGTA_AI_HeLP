@@ -44,8 +44,8 @@ test_dir = path+'/test/'
 # Set your params here!!!
 threshold = "auto"
 norm = 'new'
-num_units=256 
-hidden_layers=3
+num_units=128
+hidden_layers=4
 epochs=30
 loss="cross_entropy_loss"
 
