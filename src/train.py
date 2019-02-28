@@ -51,7 +51,7 @@ loss="cross_entropy_loss"
 
 
 # Print Information
-name = 'KHW2_MLP'
+name = 'KHW2_DL'
 model = 'MLP'
 summary1 = 'Hyperparams with MLP'
 summary2 = "threshold={} + norm={} + units={} + hidden_layers={} + epochs={} + loss={}".format(threshold, norm, num_units, hidden_layers, epochs, loss)
