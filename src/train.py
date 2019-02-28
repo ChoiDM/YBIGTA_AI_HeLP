@@ -33,7 +33,7 @@ time = str(datetime.datetime.now()).split()[1].split('.')[0]
 print("---------- Start ----------")
 print("Start:", time, "\n")
 
-path = "./notebook/data"
+path = "/data"
 pos_dir = path+"/train/positive/"
 neg_dir = path+"/train/negative/"
 save_dir = path+"/model/"
@@ -48,15 +48,13 @@ num_units=256
 hidden_layers=3
 epochs=30
 loss="cross_entropy_loss"
-gamma = 2.0
-alpha = 0.25
 
 
 # Print Information
 name = 'KHW2_MLP'
 model = 'MLP'
 summary1 = 'Hyperparams with MLP'
-summary2 = "threshold={} + norm={} + num_units={} + hidden_layers={} + epochs={} + loss={} + gamma={} + alpha={}".format(threshold, norm, num_units, hidden_layers, epochs, loss, gamma, alpha)
+summary2 = "threshold={} + norm={} + units={} + hidden_layers={} + epochs={} + loss={}".format(threshold, norm, num_units, hidden_layers, epochs, loss)
 
 print('Author Name :', name)
 print('Model :', model)
@@ -88,18 +86,8 @@ print("\n---------- Start Train ----------")
 
 #########
 ## model1
-def MLP_layers(X_train, y_train, num_units=256, hidden_layers=3, epochs=30, loss="cross_entropy_loss", gamma=2.0, alpha=0.25) :
+def dl_mlp(X_train, y_train, num_units=256, hidden_layers=3, epochs=30, loss="cross_entropy_loss") :
     
-    def focal_loss(gamma=gamma, alpha=alpha) :
-        def focal_loss_fixed(y_true, y_pred):
-            eps = 1e-12
-            y_pred=K.clip(y_pred, eps, 1.0-eps)
-            
-            pt_1 = tf.where(tf.equal(y_true, 1), y_pred, tf.ones_like(y_pred))
-            pt_0 = tf.where(tf.equal(y_true, 0), y_pred, tf.zeros_like(y_pred))
-            return -K.sum(alpha*K.pow(1.0-pt_1, gamma)*K.log(pt_1)) -K.sum((1-alpha)*K.pow(pt_0, gamma)*K.log(1.0-pt_0))
-        return focal_loss_fixed
-
     def stack_fn(num_models=X_train.shape[1], num_units=num_units, hidden_layers=hidden_layers, loss=loss):
         model = Sequential()
         
@@ -113,15 +101,14 @@ def MLP_layers(X_train, y_train, num_units=256, hidden_layers=3, epochs=30, loss
         if loss == 'cross_entropy_loss' :
             model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         elif loss == 'focal_loss' :
-            model.compile(loss=focal_loss, optimizer='adam', metrics=['accuracy'])
-            
+            model.compile(loss=focal_loss(), optimizer='adam', metrics=['accuracy'])
         return model
     
     MLP_model = KerasClassifier(build_fn=stack_fn)    
     MLP_model.fit(X_train, y_train, epochs=epochs)
     return MLP_model
 
-MLP = MLP_layers(X_train, y_train, num_units=num_units, hidden_layers=hidden_layers, epochs=epochs, loss=loss, gamma=gamma, alpha=alpha)
+MLP = dl_MLP(X_train, y_train, num_units=num_units, hidden_layers=hidden_layers, epochs=epochs, loss=loss, gamma=gamma, alpha=alpha)
 #------------------------------------------------------------------------------------------------------------------------
 
 
