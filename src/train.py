@@ -18,6 +18,7 @@ from keras.models import Sequential, model_from_json
 from keras.layers import Dense, Dropout, Conv3D, Flatten, pooling
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.utils import np_utils 
+from imgaug import augmenters as iaa
 
 import pandas as pd
 import numpy as np
@@ -59,6 +60,13 @@ epochs2 = 15
 batch_size = 4
 cube_shape = (32, 32, 16)
 
+## Data Augmentation for CNN
+seq = iaa.Sequential([
+    iaa.Fliplr(0.5), # horizontally flip 50% of the images
+    iaa.Flipud(0.2), # vertically flip 20% of the images
+    iaa.GaussianBlur(sigma=(0, 3.0)), # blur images with a sigma of 0 to 3.0
+    iaa.Afine(rotate=(-10, 10))
+], random_order = True)
 
 # Print Information
 name = 'KHW2_DL'
@@ -102,7 +110,7 @@ print("\nmodel2")
 
 data_dir = sorted(glob(os.path.join(path, mode, '*', '*')))
 data_dir, error_patient = error_check(data_dir)
-data_gen = data_generator(batch_size, mode, data_dir, cube_shape, norm, target_voxel)
+data_gen = data_generator(batch_size, mode, data_dir, cube_shape, norm, target_voxel, seq)
 
 CNN = dl_cnn(data_gen, cube_shape=cube_shape, batch_size=batch_size, epochs=epochs2)
 #------------------------------------------------------------------------------------------------------------------------
