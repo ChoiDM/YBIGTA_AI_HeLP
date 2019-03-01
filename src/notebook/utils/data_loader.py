@@ -4,12 +4,14 @@ import numpy as np
 import pandas as pd
 import os
 from random import shuffle
+import random
 import datetime
 
-from utils.Normalization import normalization
+from utils.Normalization import normalization, min_max
 from utils.Resample import resample, mask2binary
 from utils.WhiteStripeNormalization import ws_normalize
 from utils.FeatureExtract import feature_extract
+from utils.cube_tools import get_center, img2cube
 
 from concurrent.futures import ProcessPoolExecutor
 
@@ -97,8 +99,8 @@ def process_patient_wrapper(X, y, patient_num, error_patient, patient_list, file
 
 # Feature Extraction for Train
 def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/negative/', norm='new',
-                      do_resample=True, do_shuffle=True,
-                      features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3)):
+                      do_resample=True, do_shuffle=True, do_minmax=True,
+                      features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3), path="/data"):
     # File List
     pos_file_list = glob(pos_dir + "*")
     neg_file_list = glob(neg_dir + "*")
@@ -130,15 +132,18 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
     y = np.array(y)
     time = str(datetime.datetime.now()).split()[1].split('.')[0]
     print("Created X of shape {} and y of shape {} ({})".format(X.shape, y.shape, time))
-
+    
+    if do_minmax:
+        X = min_max(X, mode = 'train', path=path)
+        
     return X, y
 
 
 
 # Feature Extraction for Inference
 def test_data_loader(test_dir='/data/test/', norm='new',
-                     do_resample=True,
-                     features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3)):
+                     do_resample=True, do_minmax=True,
+                     features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3), path="/data"):
     
     # File List
     test_file_list = glob(test_dir + "*")
@@ -154,4 +159,97 @@ def test_data_loader(test_dir='/data/test/', norm='new',
 
     X = np.array(X)
     
+    if do_minmax:
+        X = min_max(X, mode = 'test', path=path)
+    
     return X, patient_num, error_patient
+
+
+# ------------------------------------------ cnn -------------------------------------------------
+
+def get_cube(patient_num, data_dir, cube_shape, norm, mode, target_voxel=(0.65, 0.65, 3)):
+    ADC_path, FLAIR_path, b1000_path, BRAIN_path, INFARCT_path = \
+        sorted([path for path in data_dir if patient_num in path])
+
+    if mode == 'train':
+        if 'positive' in ADC_path:
+            label = 1
+        
+        elif 'negative' in ADC_path:
+            label = 0
+
+    img_array1 = nib.load(ADC_path).get_data()
+    img_array2 = nib.load(FLAIR_path).get_data()
+
+    mask_nii = nib.load(INFARCT_path)
+    origin_voxel_size = mask_nii.header.get_zooms()
+    mask_array = mask_nii.get_data()
+
+    img_array1 = resample(img_array1, origin_voxel_size, target_voxel)
+    img_array2 = resample(img_array2, origin_voxel_size, target_voxel)
+    mask_array = resample(mask_array, origin_voxel_size, target_voxel)
+
+    mask_array = mask2binary(mask_array)
+
+    if norm == 'ws':
+        BRAIN_array = nib.load(BRAIN_path).get_data()
+        BRAIN_array = resample(BRAIN_array, origin_voxel_size, target_voxel)
+        img_array2 = ws_normalize(img_array2, 'FLAIR', BRAIN_array)
+
+    elif norm == 'new':
+        img_array2 = normalization(img_array2, mask_array, size= 8)
+
+    cube_center = get_center(mask_array)
+    cube_array1 = img2cube(img_array1, cube_center, cube_shape)
+    cube_array2 = img2cube(img_array2, cube_center, cube_shape)
+    
+    cube_array1 = cube_array1[..., None]
+    cube_array2 = cube_array2[..., None]
+    cube_array = np.concatenate([cube_array1, cube_array2], axis=3)
+
+    if mode == 'train':
+        return cube_array, label
+    
+    elif mode == 'test':
+        return cube_array
+    
+    else:
+        raise ValueError("value of parameter 'mode' must be 'train' or 'test'")
+
+
+def data_generator(batch_size, mode, data_dir, cube_shape, norm, target_voxel = (0.65, 0.65, 3)):
+
+    patient_list = []
+    for path in data_dir:
+        ID = path.split(os.sep)[-1].split('_')[0]
+        
+        if ID not in patient_list:
+            patient_list.append(ID)
+
+    if mode == 'train':
+        shuffle(patient_list)
+
+        while True:
+            batch_imgs = []
+            batch_labels = []
+            batch_idx = np.random.choice(len(patient_list), batch_size)
+            
+            for index in batch_idx:
+                cube_array, label = get_cube(patient_list[index], data_dir, cube_shape, norm, mode, target_voxel)
+                
+                batch_imgs.append(cube_array)
+                batch_labels.append(label)
+            
+            yield np.array(batch_imgs), np.array(batch_labels)
+
+    if mode == 'test':
+        while True:
+            batch_imgs = []
+
+            batch_idx = np.random.choice(len(patient_list), batch_size)
+
+            for index in batch_idx:
+                cube_array = get_cube(patient_list[index], data_dir, cube_shape, norm, mode, target_voxel)            
+                batch_imgs.append(cube_array)
+            
+            yield np.array(batch_imgs)

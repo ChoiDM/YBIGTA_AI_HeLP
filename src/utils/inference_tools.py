@@ -1,7 +1,31 @@
 import numpy as np
 import pandas as pd
+import os
+from glob import glob
+import nibabel as nib
+
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
+
+def error_check(data_dir):
+    mask_list = [path for path in data_dir if 'infarct' in path]
+    
+    norm_list = []
+    error_list = []
+
+    for mask_path in mask_list:
+        ID = mask_path.split(os.sep)[-1].split('_')[0]
+
+        mask_array = nib.load(mask_path).get_data()
+        mask_array[mask_array != 0] = 1
+        
+        if len(np.unique(mask_array)) == 1:
+            error_list.append(ID)
+        
+        else:
+            norm_list.extend([path for path in data_dir if ID in path])
+    
+    return norm_list, error_list
 
 
 def pred_to_binary(pred_array, threshold = 0.5, per_of_zero=45):

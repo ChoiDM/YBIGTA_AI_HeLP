@@ -7,7 +7,7 @@ from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.metrics import fbeta_score, make_scorer
 
 from keras.models import Sequential, model_from_json
-from keras.layers import Dense
+from keras.layers import Dense, Dropout, Conv3D, Flatten, pooling
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.utils import np_utils
 
@@ -16,6 +16,50 @@ import numpy as np
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 
+def dl_cnn(data_gen, cube_shape=(32,32,16), batch_size=4, epochs=20) :
+    input_shape = cube_shape + (2,)
+    steps_per_epoch =255//batch_size
+    
+    model = Sequential()
+    model.add(Conv3D(32, (3,3,3), activation='relu', input_shape = input_shape))
+    model.add(Conv3D(32, (3,3,3), activation='relu'))
+    model.add(pooling.MaxPooling3D(pool_size=(2,2,2)))
+    
+    model.add(Conv3D(32, (3,3,3), activation='relu'))
+    model.add(Conv3D(32, (3,3,3), activation='relu'))
+    model.add(pooling.MaxPooling3D(pool_size=(2,2,2)))
+    
+    model.add(Flatten())
+    model.add(Dense(128, activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(10, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
+    
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.fit_generator(data_gen, steps_per_epoch, epochs, shuffle=False)  
+    return model
+
+def dl_mlp(X_train, y_train, num_units=256, hidden_layers=3, epochs=30, loss="cross_entropy_loss") :
+    
+    def stack_fn(num_models=X_train.shape[1], num_units=num_units, hidden_layers=hidden_layers, loss=loss):
+        model = Sequential()
+        
+        for _ in range(hidden_layers) :
+            model.add(Dense(num_units, input_dim=num_models, activation='relu'))
+            model.add(Dropout(0.5))
+        
+        model.add(Dense(32, input_dim=num_units, activation='relu'))
+        model.add(Dense(2, activation='softmax'))
+        
+        if loss == 'cross_entropy_loss' :
+            model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        elif loss == 'focal_loss' :
+            model.compile(loss=focal_loss(), optimizer='adam', metrics=['accuracy'])
+        return model
+    
+    MLP_model = KerasClassifier(build_fn=stack_fn)    
+    MLP_model.fit(X_train, y_train, epochs=epochs)
+    return MLP_model
 
 def ml_xgb(X_train, y_train, cv=5, beta=0.75, params = None, random_state=1213) :
     model = XGBClassifier()

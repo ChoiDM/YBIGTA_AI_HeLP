@@ -1,8 +1,10 @@
-from utils.data_loader import train_data_loader, test_data_loader
-from utils.inference_tools import pred_to_binary, export_csv, making_result
+from utils.data_loader import train_data_loader, test_data_loader, data_generator
+from utils.inference_tools import pred_to_binary, export_csv, making_result,  error_check
 from utils.model_stacking import *
+from utils.cube_tools import *
 from utils.model_ml import *
 import vecstack
+from glob import glob
 
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
@@ -12,10 +14,10 @@ from sklearn.linear_model import LogisticRegression, Lasso, RidgeClassifier, SGD
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.metrics import fbeta_score, make_scorer
 
-from keras.models import Sequential
-from keras.layers import Dense, Dropout
+from keras.models import Sequential, model_from_json
+from keras.layers import Dense, Dropout, Conv3D, Flatten, pooling
 from keras.wrappers.scikit_learn import KerasClassifier
-from keras.utils import np_utils
+from keras.utils import np_utils 
 
 import pandas as pd
 import numpy as np
@@ -44,22 +46,30 @@ test_dir = path+'/test/'
 # Set your params here!!!
 threshold = "auto"
 norm = 'new'
-num_units=128
-hidden_layers=4
-epochs=30
+mode = 'train'
+
+## MLP
+num_units=256
+hidden_layers=3
+epochs1=30
 loss="cross_entropy_loss"
+
+## CNN
+epochs2 = 15
+batch_size = 4
+cube_shape = (32, 32, 16)
 
 
 # Print Information
 name = 'KHW2_DL'
-model = 'MLP'
-summary1 = 'Hyperparams with MLP'
-summary2 = "threshold={} + norm={} + units={} + hidden_layers={} + epochs={} + loss={}".format(threshold, norm, num_units, hidden_layers, epochs, loss)
+model = 'MLP & CNN'
+summary1 = 'Hyperparams with MLP & CNN  :  threshold={} + norm={}'.format(threshold, norm)
+summary2 = "--- MLP : units={} + hidden_layers={} + epochs={} + loss={}\n --- CNN : epochs={} + batch_size={} + cube_shape={}".format(num_units, hidden_layers, epochs1, loss, epochs2, batch_size, cube_shape)
 
 print('Author Name :', name)
 print('Model :', model)
 print('Summary :', summary1)
-print('Summary2 :', summary2)
+print('Summary2 \n', summary2)
 
 
 # Data Load
@@ -68,12 +78,9 @@ features = ['firstorder', 'shape']
 target_voxel = (0.65, 0.65, 3)
 do_resample = True
 do_shuffle = True
+do_minmax = True
 
-X_train, y_train = train_data_loader(pos_dir, neg_dir, norm, do_resample, do_shuffle, features, target_voxel)
-X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, features, target_voxel)
-
-np.save(save_dir+"X_train.npy", X_train)
-np.save(save_dir+"y_train.npy", y_train)
+X_train, y_train = train_data_loader(pos_dir, neg_dir, norm, do_resample, do_shuffle, do_minmax, features, target_voxel, path=path)
 
 
 ####################################################################z#####################################################
@@ -86,29 +93,18 @@ print("\n---------- Start Train ----------")
 
 #########
 ## model1
-def dl_mlp(X_train, y_train, num_units=256, hidden_layers=3, epochs=30, loss="cross_entropy_loss") :
-    
-    def stack_fn(num_models=X_train.shape[1], num_units=num_units, hidden_layers=hidden_layers, loss=loss):
-        model = Sequential()
-        
-        for _ in range(hidden_layers) :
-            model.add(Dense(num_units, input_dim=num_models, activation='relu'))
-            model.add(Dropout(0.5))
-        
-        model.add(Dense(32, input_dim=num_units, activation='relu'))
-        model.add(Dense(2, activation='softmax'))
-        
-        if loss == 'cross_entropy_loss' :
-            model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        elif loss == 'focal_loss' :
-            model.compile(loss=focal_loss(), optimizer='adam', metrics=['accuracy'])
-        return model
-    
-    MLP_model = KerasClassifier(build_fn=stack_fn)    
-    MLP_model.fit(X_train, y_train, epochs=epochs)
-    return MLP_model
+print("model1")
+MLP = dl_mlp(X_train, y_train, num_units=num_units, hidden_layers=hidden_layers, epochs=epochs1, loss=loss)
 
-MLP = dl_mlp(X_train, y_train, num_units=num_units, hidden_layers=hidden_layers, epochs=epochs, loss=loss)
+#########
+## model2
+print("\nmodel2")
+
+data_dir = sorted(glob(os.path.join(path, mode, '*', '*')))
+data_dir, error_patient = error_check(data_dir)
+data_gen = data_generator(batch_size, mode, data_dir, cube_shape, norm, target_voxel)
+
+CNN = dl_cnn(data_gen, cube_shape=cube_shape, batch_size=batch_size, epochs=epochs2)
 #------------------------------------------------------------------------------------------------------------------------
 
 
@@ -119,6 +115,10 @@ print("\n---------- Save Model ----------")
 MLP.model.save_weights(path+'/model/MLP.h5')
 with open(path+'/model/MLP.json', 'w') as f :
     f.write(MLP.model.to_json())
+    
+CNN.model.save_weights(path+'/model/CNN.h5')
+with open(path+'/model/CNN.json', 'w') as f :
+    f.write(CNN.model.to_json())
 #------------------------------------------------------------------------------------------------------------------------
 
 print("\n---------- train.py finished ----------")
