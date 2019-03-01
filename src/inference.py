@@ -38,7 +38,7 @@ test_dir = path+'/test/'
 # Set your params here!!!
 threshold = "auto"
 norm = 'new'
-final_idx=2
+final_idx=1 # 1=MLP, 2=CNN
 
 batch_size = 4
 mode="test"
