@@ -42,13 +42,17 @@ test_dir = path+'/test/'
 
 # Setting
 # Set your params here!!!
+random_state=1213
+deep = False
 BETA=0.75
 BETA2=0.5
 cv=5
+
 threshold = "auto"
 norm = 'new'
-deep = True
-random_state=1213
+per_of_zero = 45 
+do_minmax = True
+
 include_model = [1,4,10,11,12]
 include_model2 = [1,2,3,4]
 include_model3 = []
@@ -58,7 +62,7 @@ include_model3 = []
 name = 'KHW2_1_layer_grid'
 model = 'ML Stacking (random_state : {})'.format(random_state)
 summary1 = 'HyperParams tuning with {} ML models + 1 stacking model(NN-deep:{})'.format(len(include_model), deep)
-summary2 = "BETA={} + BETA2={} + cv={} + threshold={} + Norm={} + MinMax Normalization".format(BETA, BETA2, cv, threshold, norm)
+summary2 = "BETA={} + BETA2={} + cv={} + threshold={} + Norm={} + per_of_zero={}% + MinMax Normalization={}".format(BETA, BETA2, cv, threshold, norm, per_of_zero, do_minmax)
 
 print('Author Name :', name)
 print('Model :', model)
@@ -75,7 +79,6 @@ features = ['firstorder', 'shape']
 target_voxel = (0.65, 0.65, 3)
 do_resample = True
 do_shuffle = True
-do_minmax = True
 
 X_train, y_train = train_data_loader(pos_dir, neg_dir, norm, do_resample, do_shuffle, do_minmax, features, target_voxel, path=path)
 
@@ -201,7 +204,7 @@ y_pred_binary_lst2 =[]
 for meta in [meta_xgb, meta_logistic, meta_NN, meta_weight] :
     pred = meta.predict_proba(S_train)[:, 1]
     y_pred_lst.append(pred)
-    y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold))
+    y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold, per_of_zero=per_of_zero))
 
     
 # Print result

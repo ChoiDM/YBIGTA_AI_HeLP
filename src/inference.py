@@ -33,13 +33,17 @@ test_dir = path+'/test/'
 
 # Setting
 # Set your params here!!!
+random_state=1213
 threshold = "auto"
 norm = 'new'
-random_state=1213
+per_of_zero = 45 
+do_minmax = True
+
 include_model = [1,4,10,11,12]
 include_model2 = [1,2,3,4]
 include_model3 = []
-final_idx = 3
+
+final_idx = 3 # 1=XGB, 2=Logistic, 3=NN, 4=Weight
 
 
 # Data Load
@@ -48,7 +52,6 @@ print("\n---------- Data Load ----------")
 features = ['firstorder', 'shape']
 target_voxel = (0.65, 0.65, 3)
 do_resample = True
-do_minmax = True
 
 X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, do_minmax, features, target_voxel, path=path)
 
@@ -111,7 +114,7 @@ y_pred_binary_lst2 =[]
 for meta in models2 :
     pred = meta.predict_proba(S_test)[:, 1]
     y_pred_lst.append(pred)
-    y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold))
+    y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold, per_of_zero=per_of_zero))
 
     
 # Make 'output.csv'
