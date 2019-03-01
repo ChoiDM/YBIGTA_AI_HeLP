@@ -217,7 +217,7 @@ def get_cube(patient_num, data_dir, cube_shape, norm, mode, target_voxel=(0.65, 
         raise ValueError("value of parameter 'mode' must be 'train' or 'test'")
 
 
-def data_generator(batch_size, mode, data_dir, cube_shape, norm, target_voxel = (0.65, 0.65, 3)):
+def data_generator(batch_size, mode, data_dir, cube_shape, norm, target_voxel = (0.65, 0.65, 3), seq = None):
 
     patient_list = []
     for path in data_dir:
@@ -239,9 +239,15 @@ def data_generator(batch_size, mode, data_dir, cube_shape, norm, target_voxel = 
                 
                 batch_imgs.append(cube_array)
                 batch_labels.append(label)
-            
-            yield np.array(batch_imgs), np.array(batch_labels)
+           
+            batch_imgs = np.array(batch_imgs)
+            batch_labels = np.array(batch_labels)
 
+            if seq is not None:
+                batch_imgs = seq.augment_images(batch_imgs)
+
+            yield batch_imgs, batch_labels
+            
     if mode == 'test':
         while True:
             batch_imgs = []
