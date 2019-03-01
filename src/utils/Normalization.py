@@ -57,12 +57,14 @@ def min_max(X_array, mode, path = "/data"):
         np.save(path + '/model/max.npy', np.array(max_values))
 
         df_norm =  (df - min_values) / (max_values - min_values)
+        df_norm = df_norm.dropna(axis=1)
     
     elif mode == 'test':
         min_values = np.load(path + '/model/min.npy')
         max_values = np.load(path + '/model/max.npy')
         
         df_norm =  (df - min_values) / (max_values - min_values)
+        df_norm = df_norm.dropna(axis=1)
     
     else:
         raise ValueError("value of 'mode' parameter must be 'train' or 'test'")
