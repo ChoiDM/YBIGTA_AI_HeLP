@@ -40,7 +40,6 @@ threshold = "auto"
 norm = 'new'
 final_idx=1 # 1=MLP, 2=CNN
 
-batch_size = 4
 mode="test"
 cube_shape = (32, 32, 16)
 
@@ -87,9 +86,9 @@ y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold))
 ## CNN
 data_dir = sorted(glob(os.path.join(path, mode, '*')))
 data_dir, error_patient = error_check(data_dir)
-data_gen = data_generator(batch_size, mode, data_dir, cube_shape, norm, target_voxel)
+data_gen = data_generator(1, mode, data_dir, cube_shape, norm, target_voxel)
     
-pred = CNN.predict_generator(data_gen, steps=255//batch_size)
+pred = CNN.predict_generator(data_gen, steps=len(data_dir))
 y_pred_lst.append(pred)
 y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold))   
     
