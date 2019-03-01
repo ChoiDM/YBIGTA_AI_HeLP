@@ -27,7 +27,6 @@ pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 
 path = "/data"
-save_dir = path+"/model/"
 test_dir = path+'/test/'
 
 
@@ -54,7 +53,8 @@ target_voxel = (0.65, 0.65, 3)
 do_resample = True
 
 X_test, patient_num, error_patient = test_data_loader(test_dir, norm, do_resample, do_minmax, features, target_voxel, path=path)
-
+print(np.max(X_test, axis=1))
+print(np.min(X_test, axis=1))
 
 #########################################################################################################################
 #########################################################################################################################

@@ -36,8 +36,6 @@ print("Start:", time, "\n")
 path = "/data"
 pos_dir = path+"/train/positive/"
 neg_dir = path+"/train/negative/"
-save_dir = path+"/model/"
-test_dir = path+'/test/'
 
 
 # Setting
