@@ -112,7 +112,7 @@ data_dir = sorted(glob(os.path.join(path, mode, '*', '*')))
 data_dir, error_patient = error_check(data_dir)
 data_gen = data_generator(batch_size, mode, data_dir, cube_shape, norm, target_voxel, seq)
 
-CNN = dl_cnn(data_gen, cube_shape=cube_shape, batch_size=batch_size, epochs=epochs2)
+CNN = dl_cnn(data_gen, cube_shape=cube_shape, batch_size=batch_size, epochs=epochs2 , seq=seq)
 #------------------------------------------------------------------------------------------------------------------------
 
 
