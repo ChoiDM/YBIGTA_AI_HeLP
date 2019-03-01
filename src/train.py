@@ -58,7 +58,7 @@ include_model3 = []
 name = 'KHW2_1_layer_grid'
 model = 'ML Stacking (random_state : {})'.format(random_state)
 summary1 = 'HyperParams tuning with {} ML models + 1 stacking model(NN-deep:{})'.format(len(include_model), deep)
-summary2 = "BETA={} + BETA2={} + cv={} + threshold={} + Norm={}".format(BETA, BETA2, cv, threshold, norm)
+summary2 = "BETA={} + BETA2={} + cv={} + threshold={} + Norm={} + MinMax Normalization".format(BETA, BETA2, cv, threshold, norm)
 
 print('Author Name :', name)
 print('Model :', model)
@@ -75,8 +75,9 @@ features = ['firstorder', 'shape']
 target_voxel = (0.65, 0.65, 3)
 do_resample = True
 do_shuffle = True
+do_minmax = True
 
-X_train, y_train = train_data_loader(pos_dir, neg_dir, norm, do_resample, do_shuffle, features, target_voxel)
+X_train, y_train = train_data_loader(pos_dir, neg_dir, norm, do_resample, do_shuffle, do_minmax, features, target_voxel, path=path)
 
 
 

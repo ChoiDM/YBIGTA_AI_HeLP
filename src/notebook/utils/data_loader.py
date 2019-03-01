@@ -4,9 +4,10 @@ import numpy as np
 import pandas as pd
 import os
 from random import shuffle
+import random
 import datetime
 
-from utils.Normalization import normalization
+from utils.Normalization import normalization, min_max
 from utils.Resample import resample, mask2binary
 from utils.WhiteStripeNormalization import ws_normalize
 from utils.FeatureExtract import feature_extract
@@ -97,8 +98,8 @@ def process_patient_wrapper(X, y, patient_num, error_patient, patient_list, file
 
 # Feature Extraction for Train
 def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/negative/', norm='new',
-                      do_resample=True, do_shuffle=True,
-                      features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3)):
+                      do_resample=True, do_shuffle=True, do_minmax=True,
+                      features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3), path="/data"):
     # File List
     pos_file_list = glob(pos_dir + "*")
     neg_file_list = glob(neg_dir + "*")
@@ -130,15 +131,18 @@ def train_data_loader(pos_dir='/data/train/positive/', neg_dir='/data/train/nega
     y = np.array(y)
     time = str(datetime.datetime.now()).split()[1].split('.')[0]
     print("Created X of shape {} and y of shape {} ({})".format(X.shape, y.shape, time))
-
+    
+    if do_minmax:
+        X = min_max(X, mode = 'train', path=path)
+        
     return X, y
 
 
 
 # Feature Extraction for Inference
 def test_data_loader(test_dir='/data/test/', norm='new',
-                     do_resample=True,
-                     features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3)):
+                     do_resample=True, do_minmax=True,
+                     features = ['firstorder', 'shape'], target_voxel = (0.65, 0.65, 3), path="/data"):
     
     # File List
     test_file_list = glob(test_dir + "*")
@@ -153,5 +157,8 @@ def test_data_loader(test_dir='/data/test/', norm='new',
                             norm, do_resample, features, target_voxel)
 
     X = np.array(X)
+    
+    if do_minmax:
+        X = min_max(X, mode = 'test', path=path)
     
     return X, patient_num, error_patient
