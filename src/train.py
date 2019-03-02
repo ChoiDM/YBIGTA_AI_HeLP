@@ -110,7 +110,7 @@ if final_idx==1 :
     X_train, y_train = train_data_loader(pos_dir, neg_dir, norm, do_resample, do_shuffle, do_minmax, features, target_voxel, path=path)
     
     print("\n---------- Start Train ----------")
-    MLP = dl_mlp(X_train, y_train, optimizer=optimizer, lr=lr, num_units=num_units, hidden_layers=hidden_layers, epochs=epochs1, loss=loss)
+    MLP = dl_mlp(X_train, y_train, batch_size, optimizer=optimizer, lr=lr, num_units=num_units, hidden_layers=hidden_layers, epochs=epochs1, loss=loss)
     
     print("\n---------- Save Model ----------")
     MLP.model.save_weights(path+'/model/MLP.h5')
