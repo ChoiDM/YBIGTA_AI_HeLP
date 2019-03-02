@@ -16,9 +16,13 @@ import numpy as np
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 
-def dl_cnn(data_gen, cube_shape=(32,32,16), batch_size=4, epochs=20) :
+def dl_cnn(data_gen, cube_shape=(32,32,16), batch_size=4, epochs=20, seq=None) :
     input_shape = cube_shape + (2,)
-    steps_per_epoch =255//batch_size
+    
+    if seq is None:
+        steps_per_epoch =255//batch_size
+    else:
+        steps_per_epoch =255//batch_size*len(seq)
     
     model = Sequential()
     model.add(Conv3D(32, (3,3,3), activation='relu', input_shape = input_shape))
