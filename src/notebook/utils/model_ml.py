@@ -29,12 +29,12 @@ def dl_cnn(data_gen, cube_shape=(32,32,16), batch_size=4, epochs=20, seq=None) :
     model.add(Conv3D(32, (3,3,3), activation='relu'))
     model.add(pooling.MaxPooling3D(pool_size=(2,2,2)))
     
-    model.add(Conv3D(32, (3,3,3), activation='relu'))
-    model.add(Conv3D(32, (3,3,3), activation='relu'))
+    model.add(Conv3D(64, (3,3,3), activation='relu'))
+    model.add(Conv3D(64, (3,3,3), activation='relu'))
     model.add(pooling.MaxPooling3D(pool_size=(2,2,2)))
     
     model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
+    model.add(Dense(256, activation='relu'))
     model.add(Dropout(0.5))
     model.add(Dense(10, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
@@ -52,7 +52,7 @@ def dl_mlp(X_train, y_train, num_units=256, hidden_layers=3, epochs=30, loss="cr
             model.add(Dense(num_units, input_dim=num_models, activation='relu'))
             model.add(Dropout(0.5))
         
-        model.add(Dense(32, input_dim=num_units, activation='relu'))
+        model.add(Dense(16, input_dim=num_units, activation='relu'))
         model.add(Dense(2, activation='softmax'))
         
         if loss == 'cross_entropy_loss' :
