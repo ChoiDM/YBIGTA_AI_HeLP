@@ -42,7 +42,7 @@ threshold = "auto"
 norm = 'new'
 mode="test"
 cube_shape = (32, 32, 16)
-final_idx=1 # 1=MLP, 2=CNN ----------> check this parmas carefully!!
+final_idx=2 # 1=MLP, 2=CNN ----------> check this parmas carefully!!
 
 
 # Data Load

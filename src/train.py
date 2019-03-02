@@ -45,7 +45,7 @@ neg_dir = path+"/train/negative/"
 threshold = "auto"
 norm = 'new'
 mode = 'train'
-final_idx = 1 # 1=MLP, 2=CNN ----------> check this parmas carefully!!
+final_idx = 2 # 1=MLP, 2=CNN ----------> check this parmas carefully!!
 
 ## MLP
 num_units=256
