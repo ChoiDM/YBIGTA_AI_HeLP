@@ -38,7 +38,7 @@ test_dir = path+'/test/'
 # Set your params here!!!
 threshold = "auto"
 norm = 'new'
-final_idx=1 # 1=MLP, 2=CNN
+final_idx=2 # 1=MLP, 2=CNN
 
 mode="test"
 cube_shape = (32, 32, 16)
