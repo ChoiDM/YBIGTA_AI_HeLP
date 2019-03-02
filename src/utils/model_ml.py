@@ -7,9 +7,11 @@ from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.metrics import fbeta_score, make_scorer
 
 from keras.models import Sequential, model_from_json
-from keras.layers import Dense, Dropout, Conv3D, Flatten, pooling
+from keras.layers import Dense, Dropout, Conv3D, Flatten, pooling, Activation
+from keras.layers.normalization import BatchNormalization
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.utils import np_utils
+from keras.optimizers import SGD, Adam
 
 import pandas as pd
 import numpy as np
@@ -25,12 +27,16 @@ def dl_cnn(data_gen, cube_shape=(32,32,16), batch_size=4, epochs=20, seq=None) :
         steps_per_epoch =255//batch_size*len(seq)
     
     model = Sequential()
-    model.add(Conv3D(32, (3,3,3), activation='relu', input_shape = input_shape))
-    model.add(Conv3D(32, (3,3,3), activation='relu'))
+    model.add(Conv3D(32, (3,3,3), activation=None, input_shape = input_shape))
+    model.add(BatchNormalization())
+    model.add(Conv3D(32, (3,3,3), activation=None))
+    model.add(BatchNormalization())
     model.add(pooling.MaxPooling3D(pool_size=(2,2,2)))
     
-    model.add(Conv3D(64, (3,3,3), activation='relu'))
-    model.add(Conv3D(64, (3,3,3), activation='relu'))
+    model.add(Conv3D(64, (3,3,3), activation=None))
+    model.add(BatchNormalization())
+    model.add(Conv3D(64, (3,3,3), activation=None))
+    model.add(BatchNormalization())
     model.add(pooling.MaxPooling3D(pool_size=(2,2,2)))
     
     model.add(Flatten())
@@ -43,26 +49,52 @@ def dl_cnn(data_gen, cube_shape=(32,32,16), batch_size=4, epochs=20, seq=None) :
     model.fit_generator(data_gen, steps_per_epoch, epochs, shuffle=False)  
     return model
 
-def dl_mlp(X_train, y_train, num_units=256, hidden_layers=3, epochs=30, loss="cross_entropy_loss") :
+def dl_mlp(X_train, y_train, batch_size, optimizer='adam', lr='0.01', num_units=256, hidden_layers=3, epochs=30, loss="BCE") :
     
     def stack_fn(num_models=X_train.shape[1], num_units=num_units, hidden_layers=hidden_layers, loss=loss):
+        
+        # Build Model
         model = Sequential()
         
         for _ in range(hidden_layers) :
-            model.add(Dense(num_units, input_dim=num_models, activation='relu'))
-            model.add(Dropout(0.5))
+            model.add(Dense(num_units, input_dim=num_models, activation=None))
+            model.add(BatchNormalization())
+            model.add(Activation('relu'))
+            model.add(Dropout(0.3))
         
         model.add(Dense(16, input_dim=num_units, activation='relu'))
-        model.add(Dense(2, activation='softmax'))
         
-        if loss == 'cross_entropy_loss' :
-            model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        elif loss == 'focal_loss' :
-            model.compile(loss=focal_loss(), optimizer='adam', metrics=['accuracy'])
+        
+        # Loss Function
+        if loss == 'BCE':
+            model.add(Dense(2, activation='sigmoid'))
+            loss_func = 'binary_crossentropy'
+        
+        elif loss == 'CE':
+            model.add(Dense(2, activation='softmax'))
+            loss_func = 'categorical_crossentropy'
+        
+        elif loss == 'focal':
+            model.add(Dense(2, activation='softmax'))
+            loss_func = focal_loss()
+            
+        
+        # Optimizer
+        if optimizer == 'adam':
+            opt = Adam(lr=lr)
+        
+        elif optimizer == 'sgd':
+            opt = SGD(lr=lr, momentum=0.9, decay=1e-6)
+            
+            
+        # Compile
+        model.compile(loss=loss_func, optimizer=opt, metrics=['accuracy'])
+            
         return model
     
     MLP_model = KerasClassifier(build_fn=stack_fn)    
-    MLP_model.fit(X_train, y_train, epochs=epochs)
+    MLP_model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs)
+    
     return MLP_model
 
 def ml_xgb(X_train, y_train, cv=5, beta=0.75, params = None, random_state=1213) :
