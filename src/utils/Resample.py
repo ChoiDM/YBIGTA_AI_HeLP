@@ -1,7 +1,7 @@
 import numpy as np
 import scipy
 
-def resample(image_array, origin_voxel_size, target_voxel = (1, 1, 1)):
+def resample(image_array, origin_voxel_size, target_voxel = (0.65, 0.65, 3)):
 
     resize_factor = [o/t for o, t in zip(origin_voxel_size, target_voxel)]
 
