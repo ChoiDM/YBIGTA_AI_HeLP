@@ -53,7 +53,7 @@ hidden_layers=3
 epochs1=30
 loss = 'BCE'       # 'BCE (sigmoid)' or 'CE (softmax)' or 'focal (softmax)'
 optimizer = 'adam' # 'adam' or 'sgd'
-lr = 0.01          # learning rate
+lr = 0.005          # learning rate
 batch_size = 16
 
 ## CNN
