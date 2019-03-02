@@ -92,10 +92,10 @@ elif final_idx==2 :
     print("\n---------- Data Load ----------")
     data_dir = sorted(glob(os.path.join(path, mode, '*')))
     data_dir, error_patient = error_check(data_dir)
-    data_gen = data_generator(1, mode, data_dir, cube_shape, norm, target_voxel)
+    input_array = data_generator(1, mode, data_dir, cube_shape, norm, target_voxel)
 
     print("\n---------- Inference ----------")
-    pred = CNN.predict_generator(data_gen, steps=len(data_dir))
+    pred = CNN.predict(input_array)
     y_pred_lst.append(pred)
     y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold)) 
 #------------------------------------------------------------------------------------------------------------------------
