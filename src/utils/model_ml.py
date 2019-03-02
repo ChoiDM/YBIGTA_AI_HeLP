@@ -53,7 +53,7 @@ def dl_cnn(data_gen, cube_shape=(32,32,16), batch_size=4, epochs=20, seq=None) :
     model.fit_generator(data_gen, steps_per_epoch, epochs, shuffle=False)  
     return model
 
-def dl_mlp(X_train, y_train, batch_size, optimizer='adam', lr='0.01', num_units=256, hidden_layers=3, epochs=30, loss="BCE") :
+def dl_mlp(X_train, y_train, batch_size, optimizer='adam', lr='0.01', num_units=256, hidden_layers=3, epochs=30, loss="BCE"):
     
     def stack_fn(num_models=X_train.shape[1], num_units=num_units, hidden_layers=hidden_layers, loss=loss):
         
@@ -71,18 +71,13 @@ def dl_mlp(X_train, y_train, batch_size, optimizer='adam', lr='0.01', num_units=
         
         # Loss Function
         if loss == 'BCE':
-            model.add(Dense(2, activation='sigmoid'))
+            model.add(Dense(1, activation='sigmoid'))
             loss_func = 'binary_crossentropy'
         
         elif loss == 'CE':
             model.add(Dense(2, activation='softmax'))
             loss_func = 'categorical_crossentropy'
-        
-        elif loss == 'focal':
-            model.add(Dense(2, activation='softmax'))
-            loss_func = focal_loss()
             
-        
         # Optimizer
         if optimizer == 'adam':
             opt = Adam(lr=lr)

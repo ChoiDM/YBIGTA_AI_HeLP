@@ -31,7 +31,7 @@ pd.set_option('display.max_columns', 500)
 
 
 print("---------- Start ----------")
-path = "/data"
+path = "./notebook/data"
 save_dir = path+"/model/"
 test_dir = path+'/test/'
 
@@ -41,8 +41,9 @@ test_dir = path+'/test/'
 threshold = "auto"
 norm = 'new'
 mode="test"
+loss = 'BCE'
 cube_shape = (32, 32, 16)
-final_idx=2 # 1=MLP, 2=CNN ----------> check this parmas carefully!!
+final_idx=1 # 1=MLP, 2=CNN ----------> check this parmas carefully!!
 
 
 # Data Load
@@ -72,7 +73,10 @@ if final_idx == 1 :
     y_pred_binary_lst =[]
     
     print("\n---------- Inference ----------")
-    pred = MLP.predict_proba(X_test)[:, 1]
+    if loss == "BCE" :
+        pred = np.array([x[0] for x in MLP.predict(X_test)])
+    else :
+        pred = MLP.predict_proba(X_test)[:, 1]
     y_pred_lst.append(pred)
     y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold))
     

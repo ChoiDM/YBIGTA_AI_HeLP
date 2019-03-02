@@ -45,20 +45,20 @@ neg_dir = path+"/train/negative/"
 threshold = "auto"
 norm = 'new'
 mode = 'train'
-final_idx = 2 # 1=MLP, 2=CNN ----------> check this parmas carefully!!
+final_idx = 1 # 1=MLP, 2=CNN ----------> check this parmas carefully!!
 
 ## MLP
 num_units=256
-hidden_layers=3
+hidden_layers=2
 epochs1=30
-loss = 'BCE'       # 'BCE (sigmoid)' or 'CE (softmax)' or 'focal (softmax)'
+loss = 'BCE'       # 'BCE (sigmoid)' or 'CE (softmax)'
 optimizer = 'adam' # 'adam' or 'sgd'
 lr = 0.005          # learning rate
-batch_size = 32
+batch_size1 = 32
 
 ## CNN
-epochs2 = 5
-batch_size = 4
+epochs2 = 2
+batch_size2 = 4
 cube_shape = (32, 32, 16)
 do_augmentation = False
 
@@ -80,9 +80,9 @@ model = 'MLP & CNN'
 summary1 = 'Hyperparams with MLP & CNN  :  threshold={} + norm={}'.format(threshold, norm)
 
 if final_idx == 1:
-    summary2 = "--- MLP : units={} + hidden_layers={} + epochs={} + loss={}".format(num_units, hidden_layers, epochs1, loss)
+    summary2 = "--- MLP : units={} + hidden_layers={} + epochs={} + loss={} + optimizer={} + lr={} + batch_size={}".format(num_units, hidden_layers, epochs1, loss, optimizer, lr, batch_size1)
 elif final_idx == 2:
-    summary2 = "--- CNN : epochs={} + batch_size={} + cube_shape={} + do_augmentation={}".format(epochs2, batch_size, cube_shape, do_augmentation)
+    summary2 = "--- CNN : epochs={} + batch_size={} + cube_shape={} + do_augmentation={}".format(epochs2, batch_size2, cube_shape, do_augmentation)
 
 print('Author Name :', name)
 print('Model :', model)
@@ -110,7 +110,7 @@ if final_idx==1 :
     X_train, y_train = train_data_loader(pos_dir, neg_dir, norm, do_resample, do_shuffle, do_minmax, features, target_voxel, path=path)
     
     print("\n---------- Start Train ----------")
-    MLP = dl_mlp(X_train, y_train, batch_size, optimizer=optimizer, lr=lr, num_units=num_units, hidden_layers=hidden_layers, epochs=epochs1, loss=loss)
+    MLP = dl_mlp(X_train, y_train, batch_size1, optimizer=optimizer, lr=lr, num_units=num_units, hidden_layers=hidden_layers, epochs=epochs1, loss=loss)
     
     print("\n---------- Save Model ----------")
     MLP.model.save_weights(path+'/model/MLP.h5')
@@ -121,7 +121,7 @@ elif final_idx==2:
     print("\n---------- Data Load ----------")
     data_dir = sorted(glob(os.path.join(path, mode, '*', '*')))
     data_dir, error_patient = error_check(data_dir)
-    data_gen = data_generator(batch_size, mode, data_dir, cube_shape, norm, target_voxel, seq=None)
+    data_gen = data_generator(batch_size2, mode, data_dir, cube_shape, norm, target_voxel, seq=None)
 
     print("\n---------- Start Train ----------")
     CNN = dl_cnn(data_gen, cube_shape=cube_shape, batch_size=batch_size, epochs=epochs2 , seq=None)
