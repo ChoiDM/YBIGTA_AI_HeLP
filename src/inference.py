@@ -31,7 +31,7 @@ pd.set_option('display.max_columns', 500)
 
 
 print("---------- Start ----------")
-path = "./notebook/data"
+path = "/data"
 save_dir = path+"/model/"
 test_dir = path+'/test/'
 
