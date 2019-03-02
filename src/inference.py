@@ -46,11 +46,12 @@ X_test = np.hstack([X_ADC, X_FLAIR])
 
 
 # Load trained model
-model = load_model('data/model/model.h5')
+model = load_model('/data/model/model.h5')
+print(type(model))
 
 # Make Predictions for Test Data
 # y_pred = model.predict_proba(X_test)[:, 1]
-y_pred = model.predict_proba(X_test)
+y_pred = model.predict(X_test)
 y_pred_binary = pred_to_binary(y_pred, threshold = threshold)
 
 
