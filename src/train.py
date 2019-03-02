@@ -51,7 +51,7 @@ final_idx = 2 # 1=MLP, 2=CNN ----------> check this parmas carefully!!
 num_units=256
 hidden_layers=3
 epochs1=30
-loss="binary_crossentropy"
+loss="BCE"    # 'BCE (sigmoid)' or 'CE (softmax)'
 
 ## CNN
 epochs2 = 5
