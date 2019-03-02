@@ -101,7 +101,7 @@ elif final_idx==2 :
 # Make 'output.csv'
 final, final_df = export_csv(patient_num, error_patient, y_pred_binary_lst, y_pred_lst, path = path, index=1)
 
-print("----------------------------")
+print("\n----------------------------")
 print("---------- Result ----------")
 print("----------------------------")
 print(final_df)
