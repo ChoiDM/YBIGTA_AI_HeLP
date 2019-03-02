@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from glob import glob
 import nibabel as nib
+from utils.Resample import resample, mask2binary
 
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
@@ -17,7 +18,11 @@ def error_check(data_dir):
         ID = mask_path.split(os.sep)[-1].split('_')[0]
 
         mask_array = nib.load(mask_path).get_data()
-        mask_array[mask_array != 0] = 1
+        org_vox = nib.load(mask_path).header.get_zooms()
+        
+        # Resampling
+        mask_array = resample(mask_array, org_vox, (0.65, 0.65, 3))
+        mask_array = mask2binary(mask_array)
         
         if len(np.unique(mask_array)) == 1:
             error_list.append(ID)
