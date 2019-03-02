@@ -29,14 +29,18 @@ def dl_cnn(data_gen, cube_shape=(32,32,16), batch_size=4, epochs=20, seq=None) :
     model = Sequential()
     model.add(Conv3D(32, (3,3,3), activation=None, input_shape = input_shape))
     model.add(BatchNormalization())
+    model.add(Activation('relu'))
     model.add(Conv3D(32, (3,3,3), activation=None))
     model.add(BatchNormalization())
+    model.add(Activation('relu'))
     model.add(pooling.MaxPooling3D(pool_size=(2,2,2)))
     
     model.add(Conv3D(64, (3,3,3), activation=None))
     model.add(BatchNormalization())
+    model.add(Activation('relu'))
     model.add(Conv3D(64, (3,3,3), activation=None))
     model.add(BatchNormalization())
+    model.add(Activation('relu'))
     model.add(pooling.MaxPooling3D(pool_size=(2,2,2)))
     
     model.add(Flatten())
