@@ -51,7 +51,7 @@ final_idx = 2 # 1=MLP, 2=CNN ----------> check this parmas carefully!!
 num_units=256
 hidden_layers=3
 epochs1=30
-loss = 'BCE'       # 'BCE (sigmoid)' or 'CE (softmax)'
+loss = 'BCE'       # 'BCE (sigmoid)' or 'CE (softmax)' or 'focal (softmax)'
 optimizer = 'adam' # 'adam' or 'sgd'
 lr = 0.01          # learning rate
 
