@@ -54,7 +54,7 @@ epochs1=30
 loss = 'BCE'       # 'BCE (sigmoid)' or 'CE (softmax)' or 'focal (softmax)'
 optimizer = 'adam' # 'adam' or 'sgd'
 lr = 0.005          # learning rate
-batch_size = 16
+batch_size = 32
 
 ## CNN
 epochs2 = 5
