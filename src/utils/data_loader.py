@@ -253,18 +253,16 @@ def data_generator(batch_size, mode, data_dir, cube_shape, norm, target_voxel = 
             yield batch_imgs, batch_labels
             
     if mode == 'test':
-        while True:
-            batch_imgs = []
+        
+        batch_imgs = []
 
-            batch_idx = np.random.choice(len(patient_list), batch_size)
-
-            for index in batch_idx:
-                cube_array = get_cube(patient_list[index], data_dir, cube_shape, norm, mode, target_voxel)
+        for index in range(len(patient_list)):
+            cube_array = get_cube(patient_list[index], data_dir, cube_shape, norm, mode, target_voxel)
                 
-                if cube_array.shape != (32,32,16,2) :
-                    print("Error!!! with {} patient : Shape is".format(index, cube_array.shape))
-                    continue
+            if cube_array.shape != (32,32,16,2) :
+                print("\nError!!! with {} patient : Shape is {}".format(index, cube_array.shape))
+                continue
                     
-                batch_imgs.append(cube_array)
+            batch_imgs.append(cube_array)
             
-            yield np.array(batch_imgs)
+        return np.array(batch_imgs)
