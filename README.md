@@ -1,27 +1,38 @@
-# YBIGTA_AMC
+# AI HeLP Contest 2-1. Stroke onset time classification
+This repository contains scripts for our solution to [HeLP Challenge 2018](https://www.synapse.org/#!Synapse:syn15569329/wiki/582412). Goal of the competition was to create an algorithm to determine symptom onset time for acute ischemic stroke.
 
-### 사용법
-1. repo clone
-```bash
-$ git clone https://github.com/ChoiDM/YBIGTA_AI_HeLP.git
-```
+<br>
 
-2. repo로 이동
-```bash
-$ cd YBIGTA_AI_HeLP
-```
+## Data Description
+Data collection from Asan Medical Center was provided as the training, validation, and testing data. The size of dataset is as follows.
 
-3. docker image 생성
-```bash
-$ docker build --tag <image name>:0.0.1 .
-# 예시: dokcer build --tag test:0.0.1 .
-```
+| Dataset | Positive | Negative | Total |
+| :-------: | :-------: | :-------: | :-------: |
+| **Train** | 123 | 132 | 255 |
+| **Validation** | 26 | 18 | 44 |
+| **Test** | 33 | 23 | 56 |
 
-4. docker image 압축
-```bash
-$ docker save <image name>:0.0.1 | gzip > <image name>.tar.gz
-# 예시 docker save test:0.0.1 | gzip > test.tar.gz
-```
+<br>
 
-5. 제출
-- https://help-khidi.kakaobrain.com/contests/116
+## Model Overview
+We extracted features from combination of sequence and mask. Based on extracted features, we used stacked ensemble model.
+
+<br>
+
+## Training Methods
+### Pre-processing
+- Voxel size resampling : Resampling voxel size to (0.65, 0.65, 3) collectively
+- Normalization : Lesion-based Normalization (Entire sequence was devided by the mean value of pixels surrounding lesion region)
+
+
+### Model
+- Hyperparameters
+
+<br>
+
+## Results
+Our score for test dataset is as follows
+
+| F0.5 Score | Accuracy | AUC |
+| :-------: | :-------: | :-------: |
+| 0.7718 | 0.7142 | 0.7437 |
