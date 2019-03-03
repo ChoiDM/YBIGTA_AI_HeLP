@@ -125,7 +125,7 @@ elif final_idx==2:
     data_gen = data_generator(batch_size2, mode, data_dir, cube_shape, norm, target_voxel, seq=None)
 
     print("\n---------- Start Train ----------")
-    CNN = dl_cnn(data_gen, cube_shape=cube_shape, batch_size=batch_size, epochs=epochs2 , seq=None)
+    CNN = dl_cnn(data_gen, cube_shape=cube_shape, batch_size=batch_size2, epochs=epochs2 , seq=None)
     
     print("\n---------- Save Model ----------")
     CNN.model.save_weights(path+'/model/CNN.h5')
