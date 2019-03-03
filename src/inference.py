@@ -96,7 +96,7 @@ elif final_idx==2 :
     input_array = data_generator(1, mode, data_dir, cube_shape, norm, target_voxel)
 
     print("\n---------- Inference ----------")
-    pred = CNN.predict(input_array)
+    pred = np.array([x[0] for x in CNN.predict(input_array)])
     y_pred_lst.append(pred)
     y_pred_binary_lst.append(pred_to_binary(pred, threshold = threshold)) 
 #------------------------------------------------------------------------------------------------------------------------
