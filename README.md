@@ -11,6 +11,7 @@ Data collection from Asan Medical Center was provided as the training, validatio
 | **Test** | 33 | 23 | 56 |
 
 ## Model Overview
+We extracted features from combination of sequence and mask. Based on extracted features, we used stacked ensemble model.
 
 ## Training Methods
 ### Pre-processing
