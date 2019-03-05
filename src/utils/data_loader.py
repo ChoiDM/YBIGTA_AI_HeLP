@@ -6,9 +6,8 @@ import os
 from random import shuffle
 import random
 
-from utils.Normalization import normalization, min_max
+from utils.Normalization import normalization, min_max, ws_normalize
 from utils.Resample import resample, mask2binary
-from utils.WhiteStripeNormalization import ws_normalize
 from utils.FeatureExtract import feature_extract
 
 from concurrent.futures import ProcessPoolExecutor
