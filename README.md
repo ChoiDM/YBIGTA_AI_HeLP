@@ -18,6 +18,8 @@ Data collection from Asan Medical Center was provided as the training, validatio
 We extracted features from combination of sequence and mask. Based on extracted features, we used stacked ensemble model.
 
 ![figure1](figures/fig1.png)
+![figure2](figures/fig2.png)
+
 
 <br>
 
