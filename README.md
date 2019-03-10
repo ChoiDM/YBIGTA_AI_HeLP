@@ -34,39 +34,17 @@ We extracted features from combination of sequence and mask. Based on extracted 
 
 
 ### Model
-- Hyperparameters (by Cross Validation)
+- Hyperparameters (by 5-fold Cross Validation)
 
-  i.	Random Forest
-  (1) max_depth : 6
-  (2) n_estimators : 300
-  (3) min_samples_leaf : 20
+  i.	Random Forest - max_depth : 6, n_estimators : 300, min_samples_leaf : 20
 
-  ii.	Weight initialization
-  (1) max_depth : 5
-  (2) n_estimators : 10
+  ii.	Extra Trees - max_depth : 5, n_estimators : 10
   
-  iii.	AdaBoost
-  (1) algorithm : SAMME.R
-  (2) learning_rate : 0.01
-  (3) n_estimators : 300
+  iii. AdaBoost - algorithm : SAMME.R, learning_rate : 0.01, n_estimators : 300
 
-  iv.	XGBoost
-  (1) max_depth : 8
-  (2) colsample_bytree : 1.0
-  (3) gamma : 2.5
-  (4) subsample :0.6
-  (5) learning_rate : 0.1
-  (6) n_estimators : 500
-  (7) min_child_weight : 1
+  iv.	XGBoost - max_depth : 8, colsample_bytree : 1.0, gamma : 2.5, subsample :0.6, learning_rate : 0.1, n_estimators : 500,  min_child_weight : 1
 
-  v.	LightGBM
-  (1) subsample : 0.6
-  (2) colsample_bytree : 1.0
-  (3) reg_alpha : 5.0
-  (4) reg_lambda : 2.0
-  (5) learning_rate : 0.1
-  (6) n_estimators : 100
-  (7) min_child_weight : 5
+  v.	LightGBM - subsample : 0.6, colsample_bytree : 1.0, reg_alpha : 5.0, reg_lambda : 2.0, learning_rate : 0.1, n_estimators : 100, min_child_weight : 5
 
 
 <br>
