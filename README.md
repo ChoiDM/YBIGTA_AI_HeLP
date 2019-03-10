@@ -22,7 +22,7 @@ We extracted features from combination of sequence and mask. Based on extracted 
 <br>
 <br>
 
-![figure2](figures/fig2.png)
+![figure2](figures/figure2.png)
 
 
 <br>
